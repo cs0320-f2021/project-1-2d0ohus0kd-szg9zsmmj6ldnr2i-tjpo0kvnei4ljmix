@@ -1,38 +1,75 @@
 package kdtree;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class kdTree<T> implements kdInterface<T>{
-  int size = 0;
-  ArrayList list_data;
+public class kdTree<T> implements kdInterface<T> {
+  private int size = 0;
+  private ArrayList listData;
 
-  public kdTree(){} //Empty constructor for now
+  public kdTree() {
+  }  //Empty constructor for now
 
   /**
    * Normalizes the provided data, moves it into an ArrayList.
    * Also updates the this.size variable
+   * @return
    */
-  private ArrayList<kdItem<T>> normalizeData(Collection<T> data, List<kdGetter> getters){
+  private ArrayList<kdItem> normalizeData(Collection<T> data, List<kdGetter> getters) {
+    final int numDimensions = getters.size();
     //Create defensive copy into ArrayList while normalizing data
     ArrayList<kdItem> normalizedData = new ArrayList();
-    ArrayList<Integer[]> dataScale = new ArrayList<>();
-    //First pass to load all the data into the kdItem objects
-    for (T kdElement : data) {
-      for (kdGetter g : getters) {
-        g.getValue(kdElement);
-      }
+    ArrayList<Double[]> dataScale = new ArrayList<>(numDimensions);
+    //Fill the dataScale array with the first data value
+    for (Double[] maxMin : dataScale) {
+      maxMin = new Double[2];
+      maxMin[0] = Double.MAX_VALUE; //Set min to highest value, so it's immediately overwritten
+      maxMin[1] = Double.MIN_VALUE; //set max to lowest value, so it's immediately overwritten
     }
-    //Second pass to normalize fields within kdItem objects
 
-    return null;
+    //First pass to load all the data into the kdItem objects
+    for (T currObject : data) {
+      ArrayList dimValues = new ArrayList(numDimensions);
+      for (int dim = 0; dim < numDimensions; dim++) {
+        Double dimValue = getters.get(dim).getValue(currObject);
+        dimValues.add(dim, dimValue);
+        Double minDimVal = dataScale.get(dim)[0];
+        Double maxDimVal = dataScale.get(dim)[1];
+        if (dimValue < minDimVal) {
+          dataScale.get(dim)[0] = dimValue; //TODO: Make sure this style of accessing works
+        }
+        if (dimValue > maxDimVal) {
+          dataScale.get(dim)[1] = dimValue;
+        }
+      }
+      normalizedData.add(new kdItem(currObject, dimValues));
+    }
+
+    //Now, normalize the data using the max and min provided
+
+    //Second pass to normalize fields within kdItem objects
+    for (int i = 0; i < normalizedData.size(); i++) {
+      ArrayList<Double> dims = normalizedData.get(i).getDimensions();
+      for (int dim = 0; dim < numDimensions; dim++) {
+        double distanceFromMax = dataScale.get(dim)[1] - dims.get(dim);
+        double dataSpread = dataScale.get(dim)[1] - dataScale.get(dim)[0];
+        double newValue = 1.0 - (distanceFromMax / dataSpread);
+        dims.set(dim, newValue);
+        assert newValue > 0;
+      }
+      //Make a new kdItem and replace the old one
+      normalizedData.set(i, new kdItem(normalizedData.get(i).getOriginalItem(), dims));
+    }
+
+    return normalizedData;
   }
 
 
   @Override
   public void loadData(Collection<T> dataToLoad, List<kdGetter> getters) {
-    this.list_data = normalizeData(dataToLoad, getters);
+    this.listData = normalizeData(dataToLoad, getters);
   }
 
   @Override
@@ -60,13 +97,20 @@ public class kdTree<T> implements kdInterface<T>{
     return this.size;
   }
 
-  private class kdItem<kdObject>{
-    public kdObject originalItem;
-    public ArrayList<Integer> dimensions;
-    public kdItem(kdObject originalItem, ArrayList<Integer> dimensions){
+  private class kdItem<kdObject> { //Just a dumb data-holding class
+    private final kdObject originalItem;
+    private final ArrayList<Double> dimensions;
+    kdItem(kdObject originalItem, ArrayList<Double> dimensions) {
       this.originalItem = originalItem;
       this.dimensions = dimensions;
     }
 
+    public kdObject getOriginalItem() {
+      return this.originalItem;
+    }
+
+    public ArrayList<Double> getDimensions(){
+      return this.dimensions;
+    }
   }
 }
