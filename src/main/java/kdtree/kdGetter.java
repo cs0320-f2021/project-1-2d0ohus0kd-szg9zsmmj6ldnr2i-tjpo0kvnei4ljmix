@@ -1,5 +1,5 @@
 package kdtree;
 
 public interface kdGetter<kdElement> {
-  public int getValue(kdElement elm);
+  public double getValue(kdElement elm);
 }
