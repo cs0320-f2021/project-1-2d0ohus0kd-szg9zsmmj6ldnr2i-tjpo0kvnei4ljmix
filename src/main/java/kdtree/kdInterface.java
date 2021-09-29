@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
-interface kdInterface<ArbitraryType extends Comparable>{
+interface kdInterface<ArbitraryType>{
   //Data is normalized with the highest value in any group being 1.0, and the lowest being 0.0
   //This normalized data is used for distance comparison
 
@@ -24,9 +24,9 @@ interface kdInterface<ArbitraryType extends Comparable>{
   /** Loads data into the KD-tree. Replaces any existing data.
    *
    * @param dataToLoad data to load into the KD-tree.
-   * @param getters A list of getters that get the fields to sort by from the ArbitraryType
+   * @param getters A list of kdGetter to get the fields to sort by in the KDtree
    */
-  public void loadData(Collection<ArbitraryType> dataToLoad, List<Function> getters);
+  public void loadData(Collection<ArbitraryType> dataToLoad, List<kdGetter> getters);
 
 
   /** Finds several nearest neighbors given a data point to start from
