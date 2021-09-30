@@ -2,7 +2,7 @@ package api;
 
 import java.util.Collection;
 
-public interface apiInterface {
+public interface apiInterface<T> {
 
   //set is a collection
   //list is a collection
@@ -13,19 +13,19 @@ public interface apiInterface {
    * @param path path to JSON file
    * @return a collection of all the data from the JSON file
    */
-  public Collection getFromJson(String path);
+  public Collection<T> getFromJson(String path);
 
   /** reads from API endpoints to get a reliable and complete collection of data
    *
    * @return collection of reliable data from those API endpoints
    */
-  public Collection getFromAPI();
+  public Collection<T> getFromAPI();
 
 
   /** Gets all data from API endpoints for a specific field (e.g. 'Star Sign', 'weight')
    *
    * @return all data matching a specific field
    */
-  public Collection getField();
+  public Collection<T> getField();
 
 }
