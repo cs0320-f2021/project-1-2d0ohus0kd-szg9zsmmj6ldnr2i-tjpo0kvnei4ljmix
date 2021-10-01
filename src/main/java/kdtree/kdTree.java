@@ -7,7 +7,6 @@ public class kdTree<T> implements kdInterface<T>{
 
   @Override
   public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters) {
-
   }
 
   @Override
