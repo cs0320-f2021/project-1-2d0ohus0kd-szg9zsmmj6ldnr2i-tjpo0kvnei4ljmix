@@ -69,6 +69,7 @@ public class kdTree<T> implements kdInterface<T> {
   @Override
   public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters) {
     this.listData = normalizeData(dataToLoad, getters);
+    //listData is an ArrayList of kdItem objects, which all contain normalized fields
   }
 
   @Override
