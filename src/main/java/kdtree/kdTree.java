@@ -1,6 +1,5 @@
 package kdtree;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +16,7 @@ public class kdTree<T> implements kdInterface<T> {
    * Also updates the this.size variable
    * @return
    */
-  private ArrayList<kdItem> normalizeData(Collection<T> data, List<kdGetter> getters) {
+  private ArrayList<kdItem> normalizeData(Collection<T> data, List<kdGetter<T>> getters) {
     final int numDimensions = getters.size();
     //Create defensive copy into ArrayList while normalizing data
     ArrayList<kdItem> normalizedData = new ArrayList();
@@ -68,7 +67,7 @@ public class kdTree<T> implements kdInterface<T> {
 
 
   @Override
-  public void loadData(Collection<T> dataToLoad, List<kdGetter> getters) {
+  public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters) {
     this.listData = normalizeData(dataToLoad, getters);
   }
 
