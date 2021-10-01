@@ -63,8 +63,9 @@ public final class Main {
       runSparkServer((int) options.valueOf("port"));
     }
 
-    ArrayList<Command> commands = new ArrayList<>(Arrays.asList(
-        new Add(), new Subtract(), new LoadStars(), new NearestNeighbor()
+    ArrayList<Command> commands = new ArrayList<Command>(Arrays.asList(
+        new Add(), new Subtract(), new LoadStars(), new NearestNeighbor(),
+        new load(), new TestCommand()
     ));
     Command previousCommand = null;
     boolean help = false;
