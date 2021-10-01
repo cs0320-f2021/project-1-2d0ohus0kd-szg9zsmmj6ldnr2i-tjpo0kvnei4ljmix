@@ -1,6 +1,6 @@
 package api;
 
-public interface timedApiInterface extends apiInterface {
+public interface timedApiInterface <T> extends apiInterface<T> {
 
   /** Returns the time taken to access the API
    *
