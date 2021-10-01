@@ -1,12 +1,18 @@
 package kdtree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class kdTree<T> implements kdInterface<T> {
   private int size = 0;
-  private ArrayList listData;
+  private ArrayList<kdItem<T>> listData;
+  private kdItem<T> root;
+  private int numDims;
 
   public kdTree() {
   }  //Empty constructor for now
@@ -14,52 +20,58 @@ public class kdTree<T> implements kdInterface<T> {
   /**
    * Normalizes the provided data, moves it into an ArrayList.
    * Also updates the this.size variable
-   * @return
+   * @return arrayList of kdItem objects with normalized data inside
    */
-  private ArrayList<kdItem> normalizeData(Collection<T> data, List<kdGetter<T>> getters) {
-    final int numDimensions = getters.size();
+  private ArrayList<kdItem<T>> normalizeData(Collection<T> data, List<kdGetter<T>> getters)
+      throws IllegalArgumentException {
+    this.numDims = getters.size();
+    if (this.numDims == 0) {
+      throw new IllegalArgumentException("No Getters Provided");
+    }
+    if (data.size() == 0) {
+      throw new IllegalArgumentException("Nothing to load into KD Tree");
+    }
     //Create defensive copy into ArrayList while normalizing data
-    ArrayList<kdItem> normalizedData = new ArrayList();
-    ArrayList<Double[]> dataScale = new ArrayList<>(numDimensions);
+    ArrayList<kdItem<T>> normalizedData = new ArrayList<>();
+    Double[][] dataScale = new Double[this.numDims][2];
     //Fill the dataScale array with the first data value
     for (Double[] maxMin : dataScale) {
-      maxMin = new Double[2];
       maxMin[0] = Double.MAX_VALUE; //Set min to highest value, so it's immediately overwritten
       maxMin[1] = Double.MIN_VALUE; //set max to lowest value, so it's immediately overwritten
     }
 
     //First pass to load all the data into the kdItem objects
     for (T currObject : data) {
-      ArrayList dimValues = new ArrayList(numDimensions);
-      for (int dim = 0; dim < numDimensions; dim++) {
-        Double dimValue = getters.get(dim).getValue(currObject);
-        dimValues.add(dim, dimValue);
-        Double minDimVal = dataScale.get(dim)[0];
-        Double maxDimVal = dataScale.get(dim)[1];
+      double[] dimValues = new double[this.numDims];
+      for (int dim = 0; dim < this.numDims; dim++) {
+        double dimValue = getters.get(dim).getValue(currObject);
+        dimValues[dim] = dimValue;
+        double minDimVal = dataScale[dim][0];
+        double maxDimVal = dataScale[dim][1];
         if (dimValue < minDimVal) {
-          dataScale.get(dim)[0] = dimValue; //TODO: Make sure this style of accessing works
+          dataScale[dim][0] = dimValue;
         }
         if (dimValue > maxDimVal) {
-          dataScale.get(dim)[1] = dimValue;
+          dataScale[dim][1] = dimValue;
         }
       }
-      normalizedData.add(new kdItem(currObject, dimValues));
+      normalizedData.add(new kdItem<>(currObject, dimValues));
     }
 
     //Now, normalize the data using the max and min provided
-
     //Second pass to normalize fields within kdItem objects
     for (int i = 0; i < normalizedData.size(); i++) {
-      ArrayList<Double> dims = normalizedData.get(i).getDimensions();
-      for (int dim = 0; dim < numDimensions; dim++) {
-        double distanceFromMax = dataScale.get(dim)[1] - dims.get(dim);
-        double dataSpread = dataScale.get(dim)[1] - dataScale.get(dim)[0];
+      double[] dims = normalizedData.get(i).getDimensionArray();
+      for (int dim = 0; dim < this.numDims; dim++) {
+        double distanceFromMax = dataScale[dim][1] - dims[dim];
+        double dataSpread = dataScale[dim][1] - dataScale[dim][0];
         double newValue = 1.0 - (distanceFromMax / dataSpread);
-        dims.set(dim, newValue);
-        assert newValue > 0;
+        dims[dim] = newValue;
+        assert newValue >= 0;
+        assert newValue <= 1;
       }
       //Make a new kdItem and replace the old one
-      normalizedData.set(i, new kdItem(normalizedData.get(i).getOriginalItem(), dims));
+      normalizedData.set(i, new kdItem<>(normalizedData.get(i).getOriginalItem(), dims));
     }
 
     return normalizedData;
@@ -70,26 +82,103 @@ public class kdTree<T> implements kdInterface<T> {
   public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters) {
     this.listData = normalizeData(dataToLoad, getters);
     //listData is an ArrayList of kdItem objects, which all contain normalized fields
+
+    //This is a bad implementation of inserting, we walk the tree each time we insert an element
+    //Plus, the tree doesn't even end up being balanced
+
+    //Make sure the root is at least somewhere near the center
+    ArrayList<kdItem<T>> dataCopy = new ArrayList<>(this.listData); //for mutability
+    sortByDim(dataCopy, 0);
+    this.root = dataCopy.remove(dataCopy.size() / 2);
+    for (kdItem elm : dataCopy) {
+      this.insertItem(elm);
+    }
+  }
+
+  private void sortByDim(ArrayList<kdItem<T>> data, int dim) {
+    data.sort(new Comparator<kdItem>() {
+      @Override
+      public int compare(kdItem o1, kdItem o2) {
+        if (o1.getDimension(dim) > o2.getDimension(dim)) {
+          return 1;
+        }
+        if (o1.getDimension(dim) < o2.getDimension(dim)) {
+          return -1;
+        }
+        return 0;
+      }
+    });
+  }
+
+
+  private void insertItem(kdItem<T> toInsert) {
+    kdTree<T>.kdItem<T> prevNode = null;
+    kdTree<T>.kdItem<T> currNode = this.root;
+    int currDim = 0;
+    int side = -1;
+    while (currNode != null) {
+      side = (toInsert.getDimension(currDim) < currNode.getDimension(currDim)) ? 0 : 1;
+      //if true, side is 0 (left). if false, side is 1. (right)
+      prevNode = currNode;
+      currNode = currNode.getChildren()[side];
+      //increment dim so that next time we loop, we're checking the next dimension
+      currDim = (currDim + 1) % this.numDims;
+    }
+    //Past the while loop, this means that currNode is null.
+    if (prevNode == null) {
+      //Empty tree -- insert node as the root
+      this.root = toInsert;
+    } else {
+      prevNode.getChildren()[side] = toInsert;
+    }
+    this.size++;
   }
 
   @Override
-  public List nearestNeighbors(int n, Object center) {
+  public List<T> nearestNeighbors(int n, T center) {
+    kdItem[] best = new kdItem[n];
+    Stack<kdItem> toCheck = new Stack<>();
+    toCheck.push(this.root);
+    while (!(toCheck.empty())) {
+      System.out.println("WIP");
+    }
     return null;
   }
 
-  @Override
-  public List nearestNeighborsExcludingCenter(int n, Object center) {
-    return null;
+  /** Mutates the given array by putting the given kdItem in the correct place (maintains sort).
+   *
+   * @param best array to mutate
+   */
+  private void bubbleIntoArray(kdItem[] best, kdItem toInsert) {
+    kdItem bubble = toInsert;
+    for (int idx = 0; idx < best.length; idx++) {
+      if (best[idx] == null) {
+        //array is not yet fully filled
+        best[idx] = bubble;
+        return;
+      }
+      if (best[idx].getDistance() > bubble.getDistance()) {
+        kdItem tmp = best[idx];
+        best[idx] = bubble;
+        bubble = tmp;
+      }
+    }
   }
 
   @Override
-  public List getAll() {
-    return null;
+  public List<T> nearestNeighborsExcludingCenter(int n, T center) {
+    return this.nearestNeighbors(n + 1, center).subList(1, n + 1); // just take out first result
   }
 
   @Override
-  public boolean contains(Object target) {
-    return false;
+  public List<T> getAll() {
+    //get original objects out of the kdItem classes, and return as a list
+    return this.listData.stream().map(kdItem::getOriginalItem).collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean contains(T target) {
+    return nearestNeighbors(1, target).get(0).equals(target);
   }
 
   @Override
@@ -97,10 +186,52 @@ public class kdTree<T> implements kdInterface<T> {
     return this.size;
   }
 
+  @Override
+  public String toString() {
+    String output  = "kdTree with root: " + Arrays.toString(this.root.getDimensionArray())
+        + " Left children: " + countChildren(this.root.getChildren()[0])
+        + " Right children: " + countChildren(this.root.getChildren()[1]);
+
+    if (this.size == 0) {
+      output += "\nThe tree is empty";
+      return output;
+    }
+
+    if (this.size < 16) {
+      //Print the structure of the tree
+      output += "\n" + this.root.toString();
+    }
+
+    return output;
+  }
+
+  /**
+   *
+   * @return array of length 2 with left and right node counts for given item
+   */
+  private int countChildren(kdItem<T> currNode) {
+    if (currNode == null) {
+      return 0;
+    }
+    kdItem<T>[] children = currNode.children;
+    int count = 0;
+    if (children[0] != null) {
+      count += countChildren(children[0]);
+    }
+    if (children[1] != null) {
+      count += countChildren(children[1]);
+    }
+    return count + 1;
+  }
+
   private class kdItem<kdObject> { //Just a dumb data-holding class
     private final kdObject originalItem;
-    private final ArrayList<Double> dimensions;
-    kdItem(kdObject originalItem, ArrayList<Double> dimensions) {
+    private final double[] dimensions;
+    private final kdItem<kdObject>[] children = new kdItem[2];
+
+    private double distance;
+
+    kdItem(kdObject originalItem, double[] dimensions) {
       this.originalItem = originalItem;
       this.dimensions = dimensions;
     }
@@ -109,8 +240,46 @@ public class kdTree<T> implements kdInterface<T> {
       return this.originalItem;
     }
 
-    public ArrayList<Double> getDimensions(){
+    public double[] getDimensionArray() {
       return this.dimensions;
     }
+
+    public double getDimension(int idx) {
+      return this.dimensions[idx];
+    }
+
+    public kdItem<kdObject>[] getChildren() {
+      return children;
+    }
+
+    public double getDistance() {
+      return distance;
+    }
+
+    public void calcDistance(double[] otherDims) {
+      double dist = 0;
+      for (int dim = 0; dim < this.dimensions.length; dim++) {
+        dist += Math.pow((this.dimensions[dim] - otherDims[dim]), 2);
+      }
+      this.distance = dist;
+    }
+
+    @Override
+    public String toString() {
+      String output =  "Node containing: " + Arrays.toString(this.dimensions);
+      if (this.children[0] != null) {
+        output += "  { Left Child ->" + this.children[0].toString() + " }";
+      } else {
+        output += "  { No Left Child }";
+      }
+      if (this.children[1] != null) {
+        output += "  { Right Child ->" + this.children[1].toString() + " }";
+      } else {
+        output += "  { No Right Child }";
+      }
+      return output;
+    }
   }
+
+
 }
