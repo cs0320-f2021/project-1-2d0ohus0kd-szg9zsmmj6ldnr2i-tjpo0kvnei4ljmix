@@ -27,6 +27,7 @@ END_TAG = 'END'
 # Message prefixes in the program's output
 ERROR_PREFIX = 'ERROR:'
 IGNORE_PREFIX = 'INFO:'
+WARN_PREFIX = "WARNING:"
 
 differ = difflib.Differ()
 
@@ -166,7 +167,7 @@ class Test:
 
         actual = []
         for line in temp:
-          if not line.startswith(IGNORE_PREFIX):
+          if not (line.startswith(IGNORE_PREFIX) or line.startswith(WARN_PREFIX)):
             actual.append(line.rstrip('\n') if not ignore_whitespace else line.rstrip())
 
     passed = Test.acceptable(self.expected, actual)
