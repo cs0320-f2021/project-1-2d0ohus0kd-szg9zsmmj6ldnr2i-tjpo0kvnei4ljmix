@@ -5,8 +5,10 @@ import kdtree.kdTree;
 import org.junit.Test;
 
 import java.awt.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,6 +19,17 @@ public class kdTest {
     //Test whether kdTree was constructed properly
 
     //
+
+    private ArrayList<Star> generateStars(int numToGenerate) {
+        ArrayList<Star> starList = new ArrayList<>();
+        Random r = new Random();
+        for (int i = 0; i < numToGenerate; i++) {
+            Star newstar = new Star(i, "StarNumber: " + i, r.nextDouble() * 1000, r.nextDouble() * 1000, r.nextDouble() * 1000);
+            starList.add(newstar);
+        }
+        return starList;
+    }
+    //generateStars(100)
 
 
     @Test
