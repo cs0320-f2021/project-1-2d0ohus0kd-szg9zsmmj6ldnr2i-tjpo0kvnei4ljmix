@@ -25,6 +25,9 @@ public class kdTest {
         Star star5 = new Star(5, "fifth", 0, 0, 10);
         Star star6 = new Star(6, "sixth", 0, 0, 14);
         Star star7 = new Star(7, "seventh", 0, 0, 14);
+        Star star8 = new Star(8, "eight", 0, 0, 9);
+        Star star9 = new Star(9, "nine", 0, 0, 9);
+
 
 
         //straightforward case
@@ -33,8 +36,12 @@ public class kdTest {
         //equal distance between n stars
         assertEquals(NearestNeighbors(2, star5),(star4, star6));
 
-        //equal distance between >n stars --> IMPLEMENTATION - DECIDE WHAT TO DEFAULT TO IN THESE CASES
-        assertEquals(NearestNeighbors(2, star5),;
+        //equal distance between >n stars
+        assertEquals(NearestNeighbors(2, star4), (star3, star8),;
+
+        //fewer than 'n' nodes in the tree --> return all nodes (except for the one inputted)
+        assertEquals(NearestNeighbors(500, star4), (star1, star2, star3, star5, star6, star7, star8, star9);
+
 
 
     }
