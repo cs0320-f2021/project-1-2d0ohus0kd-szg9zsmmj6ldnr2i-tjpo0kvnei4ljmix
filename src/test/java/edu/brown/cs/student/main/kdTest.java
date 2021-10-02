@@ -42,7 +42,10 @@ public class kdTest {
         //fewer than 'n' nodes in the tree --> return all nodes (except for the one inputted)
         assertEquals(NearestNeighbors(500, star4), (star1, star2, star3, star5, star6, star7, star8, star9);
 
+        //0 nodes
+        assertEquals(NearestNeighbors(0, star4), null);
 
-
+        //non-existent star
+        assertEquals(NearestNeighbors(2, iDontExist), "Error: star not found";
     }
 }
