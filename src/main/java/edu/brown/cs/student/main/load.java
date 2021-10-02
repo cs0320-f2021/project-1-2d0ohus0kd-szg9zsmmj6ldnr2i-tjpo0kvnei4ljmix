@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.function.Function;
 
 public class load extends Command{
-  private int NUM_PEOPLE = 10;
 
   public load() {
     super(new HashSet<String>(Arrays.asList("loadtmp")));
@@ -19,11 +18,12 @@ public class load extends Command{
 
   @Override
   public String run(String argString) {
+    int numPeople = Integer.parseInt(argString);
     kdTree kd = new kdTree();
     ArrayList<dummyPerson> people = new ArrayList<>();
     Random rng = new Random();
-    for (int i = 0; i < NUM_PEOPLE; i++) {
-      people.add(new dummyPerson(rng.nextDouble(), rng.nextDouble(), rng.nextDouble()));
+    for (int i = 0; i < numPeople; i++) {
+      people.add(new dummyPerson(rng.nextDouble() * 123, rng.nextDouble() * 456, rng.nextDouble() * 789));
     }
 
     ArrayList<kdGetter<dummyPerson>> getters = new ArrayList<>(2);

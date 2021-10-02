@@ -1,5 +1,7 @@
 package kdtree;
 
+import com.google.common.math.DoubleMath;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +15,7 @@ public class kdTree<T> implements kdInterface<T> {
   private ArrayList<kdItem<T>> listData;
   private kdItem<T> root;
   private int numDims;
+  private List<kdGetter<T>> kdGetters;
 
   public kdTree() {
   }  //Empty constructor for now
@@ -24,6 +27,7 @@ public class kdTree<T> implements kdInterface<T> {
    */
   private ArrayList<kdItem<T>> normalizeData(Collection<T> data, List<kdGetter<T>> getters)
       throws IllegalArgumentException {
+    this.kdGetters = getters;
     this.numDims = getters.size();
     if (this.numDims == 0) {
       throw new IllegalArgumentException("No Getters Provided");
@@ -65,7 +69,10 @@ public class kdTree<T> implements kdInterface<T> {
       for (int dim = 0; dim < this.numDims; dim++) {
         double distanceFromMax = dataScale[dim][1] - dims[dim];
         double dataSpread = dataScale[dim][1] - dataScale[dim][0];
-        double newValue = 1.0 - (distanceFromMax / dataSpread);
+        double newValue = 0;
+        if (!(DoubleMath.fuzzyEquals(dataSpread, 0, 0.000001))) {
+          newValue = 1.0 - (distanceFromMax / dataSpread);
+        }
         dims[dim] = newValue;
         assert newValue >= 0;
         assert newValue <= 1;
@@ -90,6 +97,7 @@ public class kdTree<T> implements kdInterface<T> {
     ArrayList<kdItem<T>> dataCopy = new ArrayList<>(this.listData); //for mutability
     sortByDim(dataCopy, 0);
     this.root = dataCopy.remove(dataCopy.size() / 2);
+    this.size = 1;
     for (kdItem elm : dataCopy) {
       this.insertItem(elm);
     }
@@ -127,20 +135,48 @@ public class kdTree<T> implements kdInterface<T> {
     //Past the while loop, this means that currNode is null.
     if (prevNode == null) {
       //Empty tree -- insert node as the root
+      toInsert.setChildrenSortDim(currDim - 1);
       this.root = toInsert;
     } else {
+      toInsert.setChildrenSortDim(currDim);
       prevNode.getChildren()[side] = toInsert;
     }
     this.size++;
   }
 
   @Override
-  public List<T> nearestNeighbors(int n, T center) {
+  public List<T> nearestNeighbors(int n, T targetRaw) {
+    //convert target to a kdItem object
+    double[] dims = new double[this.numDims];
+    for (int i = 0; i < this.numDims; i++) {
+      dims[i] = this.kdGetters.get(i).getValue(targetRaw);
+    }
+    kdItem<T> target = new kdItem<>(targetRaw, dims);
     kdItem[] best = new kdItem[n];
     Stack<kdItem> toCheck = new Stack<>();
     toCheck.push(this.root);
+    double bestDist = Double.MAX_VALUE;
     while (!(toCheck.empty())) {
-      System.out.println("WIP");
+      kdItem currItem = toCheck.pop();
+      int currDim = currItem.getChildrenSortDim();
+      int idealSide = target.getDimension(currDim) < currItem.getDimension(currDim) ? 0 : 1;
+      // If the target's value is less than current, go left (0), otherwise right (1)
+      int nonIdealSide = (idealSide == 1) ? 0 : 1; //opposite of the ideal side
+      currItem.calcDistance(target.getDimensionArray());
+      if (bestDist > currItem.getDistance()) {
+        bubbleIntoArray(best, currItem); //Insert into array of best values
+      }
+      if (currItem.getChildren()[idealSide] != null) {
+        //if not equal to null, we need to check the ideal child
+        toCheck.push(currItem.getChildren()[idealSide]);
+      }
+      double best1dim = Math.abs(target.getDimension(currDim) - currItem.getDimension(currDim));
+      if (best1dim < bestDist) {
+        //This means the other child could have a good value, we need to check it
+        toCheck.push(currItem.getChildren()[nonIdealSide]);
+        //TODO: Optimize by storing best1dim in the toCheck, so it can be skipped sometimes
+        // ^ also, push the ideal branch first, because it's more likely to contain the answer
+      }
     }
     return null;
   }
@@ -148,14 +184,15 @@ public class kdTree<T> implements kdInterface<T> {
   /** Mutates the given array by putting the given kdItem in the correct place (maintains sort).
    *
    * @param best array to mutate
+   * @return new best distance
    */
-  private void bubbleIntoArray(kdItem[] best, kdItem toInsert) {
+  private double bubbleIntoArray(kdItem[] best, kdItem toInsert) {
     kdItem bubble = toInsert;
     for (int idx = 0; idx < best.length; idx++) {
       if (best[idx] == null) {
         //array is not yet fully filled
         best[idx] = bubble;
-        return;
+        return Double.MAX_VALUE;
       }
       if (best[idx].getDistance() > bubble.getDistance()) {
         kdItem tmp = best[idx];
@@ -163,6 +200,8 @@ public class kdTree<T> implements kdInterface<T> {
         bubble = tmp;
       }
     }
+    //Getting here means array is fully filled
+    return best[best.length - 1].getDistance();
   }
 
   @Override
@@ -197,7 +236,7 @@ public class kdTree<T> implements kdInterface<T> {
       return output;
     }
 
-    if (this.size < 16) {
+    if (this.size < 32) {
       //Print the structure of the tree
       output += "\n" + this.root.toString();
     }
@@ -228,8 +267,8 @@ public class kdTree<T> implements kdInterface<T> {
     private final kdObject originalItem;
     private final double[] dimensions;
     private final kdItem<kdObject>[] children = new kdItem[2];
-
-    private double distance;
+    private int childrenSortDim = -1; //dimension which the object will sort its children by
+    private double distance = -1;
 
     kdItem(kdObject originalItem, double[] dimensions) {
       this.originalItem = originalItem;
@@ -252,7 +291,19 @@ public class kdTree<T> implements kdInterface<T> {
       return children;
     }
 
+    public int getChildrenSortDim() {
+      return childrenSortDim;
+    }
+
+    public void setChildrenSortDim(int childrenSortDim) {
+      this.childrenSortDim = childrenSortDim;
+    }
+
     public double getDistance() {
+      if (this.distance < 0) {
+        //Error, distance was gotten before it was set
+        throw new RuntimeException("kdItem Distance was retrieved before being set!");
+      }
       return distance;
     }
 
@@ -279,6 +330,7 @@ public class kdTree<T> implements kdInterface<T> {
       }
       return output;
     }
+
   }
 
 
