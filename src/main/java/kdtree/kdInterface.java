@@ -54,6 +54,7 @@ interface kdInterface<ArbitraryType>{
    */
   public boolean contains(ArbitraryType target);
 
+
   /**
    *
    * @return number of items in the KD-Tree
