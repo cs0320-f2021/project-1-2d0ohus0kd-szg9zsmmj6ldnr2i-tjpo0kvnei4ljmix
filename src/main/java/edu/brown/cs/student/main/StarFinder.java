@@ -114,7 +114,7 @@ public class StarFinder {
       starData.add(new Star(id, properName, x, y, z));
     }
 
-    this.kdt.loadData(this.starData, this.starGetters);
+    this.kdt.loadData(this.starData, this.starGetters, false);
 
     return "Read " + this.starData.size() + " stars from " + path;
     //System.out.println("The first star is named " + starData.get(0).getName());
