@@ -26,7 +26,7 @@ public class load extends Command{
       people.add(new dummyPerson(rng.nextDouble() * 123, rng.nextDouble() * 456, rng.nextDouble() * 789));
     }
 
-    ArrayList<kdGetter<dummyPerson>> getters = new ArrayList<>(2);
+    ArrayList<kdGetter<dummyPerson>> getters = new ArrayList<>(3);
 
     getters.add(new kdGetter<dummyPerson>() {
       @Override
@@ -40,8 +40,15 @@ public class load extends Command{
         return elm.height;
       }
     });
+    getters.add(new kdGetter<dummyPerson>() {
+      @Override
+      public double getValue(dummyPerson elm) {
+        return elm.age;
+      }
+    });
 
     kd.loadData(people, getters);
+    System.out.println(kd.nearestNeighbors(5, new dummyPerson(100,400, 700)));
     return kd.toString();
   }
 
