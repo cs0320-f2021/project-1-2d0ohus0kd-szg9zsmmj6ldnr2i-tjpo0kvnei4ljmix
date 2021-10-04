@@ -16,6 +16,8 @@ public class kdTree<T> implements kdInterface<T> {
   private kdItem<T> root;
   private int numDims;
   private List<kdGetter<T>> kdGetters;
+  private Double[][] dataScale;
+  private Double[] dataRange;
 
   public kdTree() {
   }  //Empty constructor for now
@@ -36,7 +38,7 @@ public class kdTree<T> implements kdInterface<T> {
     }
     //Create defensive copy into ArrayList while normalizing data
     ArrayList<kdItem<T>> normalizedData = new ArrayList<>();
-    Double[][] dataScale = new Double[this.numDims][2];
+    this.dataScale = new Double[this.numDims][2];
     //Fill the dataScale array with the first data value
     for (Double[] maxMin : dataScale) {
       maxMin[0] = Double.MAX_VALUE; //Set min to highest value, so it's immediately overwritten
@@ -61,26 +63,37 @@ public class kdTree<T> implements kdInterface<T> {
       normalizedData.add(new kdItem<>(currObject, dimValues));
     }
 
+    //Create dataRange
+    assert this.numDims == this.dataScale.length;
+    this.dataRange = new Double[this.numDims];
+    for (int i = 0; i < this.numDims; i++) {
+      dataRange[i] = this.dataScale[i][1] - this.dataScale[i][0];
+    }
+
+
     //Now, normalize the data using the max and min provided
     //Second pass to normalize fields within kdItem objects
     for (int i = 0; i < normalizedData.size(); i++) {
       double[] dims = normalizedData.get(i).getDimensionArray();
       for (int dim = 0; dim < this.numDims; dim++) {
-        double distanceFromMax = dataScale[dim][1] - dims[dim];
-        double dataSpread = dataScale[dim][1] - dataScale[dim][0];
-        double newValue = 0;
-        if (!(DoubleMath.fuzzyEquals(dataSpread, 0, 0.000001))) {
-          newValue = 1.0 - (distanceFromMax / dataSpread);
-        }
-        dims[dim] = newValue;
-        assert newValue >= 0;
-        assert newValue <= 1;
+        dims[dim] = normalizeSingleValue(dims[dim], dim);
       }
       //Make a new kdItem and replace the old one
       normalizedData.set(i, new kdItem<>(normalizedData.get(i).getOriginalItem(), dims));
     }
 
     return normalizedData;
+  }
+
+  private double normalizeSingleValue(double dataPoint, int dim) {
+    double distanceFromMax = dataScale[dim][1] - dataPoint;
+    double newValue = 0;
+    if (!(DoubleMath.fuzzyEquals(dataRange[dim], 0, 0.000001))) {
+      newValue = 1.0 - (distanceFromMax / dataRange[dim]);
+    }
+    assert newValue >= 0;
+    assert newValue <= 1;
+    return newValue;
   }
 
 
@@ -96,9 +109,7 @@ public class kdTree<T> implements kdInterface<T> {
     //Make sure the root is at least somewhere near the center
     ArrayList<kdItem<T>> dataCopy = new ArrayList<>(this.listData); //for mutability
     sortByDim(dataCopy, 0);
-    this.root = dataCopy.remove(dataCopy.size() / 2);
-    this.size = 1;
-    for (kdItem elm : dataCopy) {
+    for (kdItem<T> elm : dataCopy) {
       this.insertItem(elm);
     }
   }
@@ -133,12 +144,11 @@ public class kdTree<T> implements kdInterface<T> {
       currDim = (currDim + 1) % this.numDims;
     }
     //Past the while loop, this means that currNode is null.
+    toInsert.setChildrenSortDim(currDim);
     if (prevNode == null) {
       //Empty tree -- insert node as the root
-      toInsert.setChildrenSortDim(currDim - 1);
       this.root = toInsert;
     } else {
-      toInsert.setChildrenSortDim(currDim);
       prevNode.getChildren()[side] = toInsert;
     }
     this.size++;
@@ -149,11 +159,12 @@ public class kdTree<T> implements kdInterface<T> {
     //convert target to a kdItem object
     double[] dims = new double[this.numDims];
     for (int i = 0; i < this.numDims; i++) {
-      dims[i] = this.kdGetters.get(i).getValue(targetRaw);
+      dims[i] = this.normalizeSingleValue(this.kdGetters.get(i).getValue(targetRaw), i);
     }
     kdItem<T> target = new kdItem<>(targetRaw, dims);
     kdItem<T>[] best = new kdItem[n];
     Stack<kdItem> toCheck = new Stack<>();
+    assert (this.root != null);
     toCheck.push(this.root);
     double bestDist = Double.MAX_VALUE;
     while (!(toCheck.empty())) {
@@ -164,7 +175,7 @@ public class kdTree<T> implements kdInterface<T> {
       int nonIdealSide = (idealSide == 1) ? 0 : 1; //opposite of the ideal side
       currItem.calcDistance(target.getDimensionArray());
       if (bestDist > currItem.getDistance()) {
-        bubbleIntoArray(best, currItem); //Insert into array of best values
+        bestDist = bubbleIntoArray(best, currItem); //Insert into array of best values
       }
       if (currItem.getChildren()[idealSide] != null) {
         //if not equal to null, we need to check the ideal child
@@ -172,14 +183,19 @@ public class kdTree<T> implements kdInterface<T> {
       }
       double best1dim = Math.abs(target.getDimension(currDim) - currItem.getDimension(currDim));
       if (best1dim < bestDist) {
-        //This means the other child could have a good value, we need to check it
-        toCheck.push(currItem.getChildren()[nonIdealSide]);
+        //This means the other child could have a good value, we need to check it if not null
+        if (currItem.getChildren()[nonIdealSide] != null) {
+          toCheck.push(currItem.getChildren()[nonIdealSide]);
+        }
         //TODO: Optimize by storing best1dim in the toCheck, so it can be skipped sometimes
         // ^ also, push the ideal branch first, because it's more likely to contain the answer
         // ^ this way, we basically walk the whole tree which is bad
       }
     }
-    ArrayList<T> bestList = new ArrayList<>((Collection<? extends T>) Arrays.asList(best));
+    ArrayList<T> bestList = new ArrayList<>();
+    for (kdItem<T> elm : best) {
+      bestList.add(elm.originalItem);
+    }
     return bestList;
   }
 
@@ -269,8 +285,8 @@ public class kdTree<T> implements kdInterface<T> {
     private final kdObject originalItem;
     private final double[] dimensions;
     private final kdItem<kdObject>[] children = new kdItem[2];
-    private int childrenSortDim = -1; //dimension which the object will sort its children by
-    private double distance = -1;
+    private int childrenSortDim = -2; //dimension which the object will sort its children by
+    private double distance = -2;
 
     kdItem(kdObject originalItem, double[] dimensions) {
       this.originalItem = originalItem;
