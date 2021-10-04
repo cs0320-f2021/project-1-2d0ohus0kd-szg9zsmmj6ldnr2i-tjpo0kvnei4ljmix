@@ -61,5 +61,14 @@ public class load extends Command{
       this.height = height;
       this.age = age;
     }
+
+    @Override
+    public String toString() {
+      return "dummyPerson{" +
+          "weight=" + weight +
+          ", height=" + height +
+          ", age=" + age +
+          '}';
+    }
   }
 }

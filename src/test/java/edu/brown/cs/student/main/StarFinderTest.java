@@ -158,7 +158,6 @@ public class StarFinderTest {
     correct.add(new Star(70667,"Proxima Centauri",-0.47175,-0.36132,-1.15037));
     correct.add(new Star(71454,"Rigel Kentaurus B",-0.50359,-0.42128,-1.1767));
     assertTrue(starsEqual(result, correct));
-
   }
 
   @Test
