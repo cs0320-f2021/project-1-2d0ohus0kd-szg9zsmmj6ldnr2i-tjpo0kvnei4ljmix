@@ -18,6 +18,7 @@ public class kdTree<T> implements kdInterface<T> {
   private List<kdGetter<T>> kdGetters;
   private Double[][] dataScale;
   private Double[] dataRange;
+  private boolean normalize = true;
 
   public kdTree() {
   }  //Empty constructor for now
@@ -77,6 +78,11 @@ public class kdTree<T> implements kdInterface<T> {
       double[] dims = normalizedData.get(i).getDimensionArray();
       for (int dim = 0; dim < this.numDims; dim++) {
         dims[dim] = normalizeSingleValue(dims[dim], dim);
+        //Sanity check to make sure normalization went well
+        if (this.normalize){
+          assert dims[dim] >= 0;
+          assert dims[dim] <= 1;
+        }
       }
       //Make a new kdItem and replace the old one
       normalizedData.set(i, new kdItem<>(normalizedData.get(i).getOriginalItem(), dims));
@@ -86,13 +92,14 @@ public class kdTree<T> implements kdInterface<T> {
   }
 
   private double normalizeSingleValue(double dataPoint, int dim) {
-    double distanceFromMax = dataScale[dim][1] - dataPoint;
-    double newValue = 0;
-    if (!(DoubleMath.fuzzyEquals(dataRange[dim], 0, 0.000001))) {
-      newValue = 1.0 - (distanceFromMax / dataRange[dim]);
+    double newValue = dataPoint;
+    if (this.normalize) {
+      double distanceFromMax = dataScale[dim][1] - dataPoint;
+      newValue = 0;
+      if (!(DoubleMath.fuzzyEquals(dataRange[dim], 0, 0.000001))) {
+        newValue = 1.0 - (distanceFromMax / dataRange[dim]);
+      }
     }
-    assert newValue >= 0;
-    assert newValue <= 1;
     return newValue;
   }
 
@@ -112,6 +119,11 @@ public class kdTree<T> implements kdInterface<T> {
     for (kdItem<T> elm : dataCopy) {
       this.insertItem(elm);
     }
+  }
+
+  public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters, boolean normalize) {
+    this.normalize = normalize;
+    this.loadData(dataToLoad, getters);
   }
 
   private void sortByDim(ArrayList<kdItem<T>> data, int dim) {
@@ -156,10 +168,18 @@ public class kdTree<T> implements kdInterface<T> {
 
   @Override
   public List<T> nearestNeighbors(int n, T targetRaw) {
+    if (n == 0) {
+      return new ArrayList<T>(); //return empty list if asking for 0 neighbors
+    }
     //convert target to a kdItem object
     double[] dims = new double[this.numDims];
     for (int i = 0; i < this.numDims; i++) {
       dims[i] = this.normalizeSingleValue(this.kdGetters.get(i).getValue(targetRaw), i);
+      //Sanity check to make sure normalization went well
+      if (this.normalize){
+        assert dims[i] >= 0;
+        assert dims[i] <= 1;
+      }
     }
     kdItem<T> target = new kdItem<>(targetRaw, dims);
     kdItem<T>[] best = new kdItem[n];
@@ -194,7 +214,9 @@ public class kdTree<T> implements kdInterface<T> {
     }
     ArrayList<T> bestList = new ArrayList<>();
     for (kdItem<T> elm : best) {
-      bestList.add(elm.originalItem);
+      if (elm != null) {
+        bestList.add(elm.originalItem);
+      }
     }
     return bestList;
   }
