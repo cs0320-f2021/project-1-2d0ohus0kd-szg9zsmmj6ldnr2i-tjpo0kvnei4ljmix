@@ -27,7 +27,6 @@ public class kdTree<T> implements kdInterface<T> {
    */
   private ArrayList<kdItem<T>> normalizeData(Collection<T> data, List<kdGetter<T>> getters)
       throws IllegalArgumentException {
-    this.kdGetters = getters;
     this.numDims = getters.size();
     if (this.numDims == 0) {
       throw new IllegalArgumentException("No Getters Provided");
@@ -87,6 +86,7 @@ public class kdTree<T> implements kdInterface<T> {
 
   @Override
   public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters) {
+    this.kdGetters = new ArrayList<>(getters);
     this.listData = normalizeData(dataToLoad, getters);
     //listData is an ArrayList of kdItem objects, which all contain normalized fields
 
@@ -152,7 +152,7 @@ public class kdTree<T> implements kdInterface<T> {
       dims[i] = this.kdGetters.get(i).getValue(targetRaw);
     }
     kdItem<T> target = new kdItem<>(targetRaw, dims);
-    kdItem[] best = new kdItem[n];
+    kdItem<T>[] best = new kdItem[n];
     Stack<kdItem> toCheck = new Stack<>();
     toCheck.push(this.root);
     double bestDist = Double.MAX_VALUE;
@@ -176,9 +176,11 @@ public class kdTree<T> implements kdInterface<T> {
         toCheck.push(currItem.getChildren()[nonIdealSide]);
         //TODO: Optimize by storing best1dim in the toCheck, so it can be skipped sometimes
         // ^ also, push the ideal branch first, because it's more likely to contain the answer
+        // ^ this way, we basically walk the whole tree which is bad
       }
     }
-    return null;
+    ArrayList<T> bestList = new ArrayList<>((Collection<? extends T>) Arrays.asList(best));
+    return bestList;
   }
 
   /** Mutates the given array by putting the given kdItem in the correct place (maintains sort).
