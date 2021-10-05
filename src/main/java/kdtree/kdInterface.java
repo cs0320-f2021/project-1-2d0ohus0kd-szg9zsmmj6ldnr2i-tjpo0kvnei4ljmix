@@ -40,20 +40,12 @@ interface kdInterface<ArbitraryType>{
 
   public List<ArbitraryType> nearestNeighborsExcludingCenter(int n, ArbitraryType center);
 
-
   /**
    *
    * @return A list of all the items in the KD-tree in no particular order
    */
   public List<ArbitraryType> getAll();
 
-
-  /**
-   *
-   * @param target item to check against the KD-Tree
-   * @return true if the KD-Tree contains the target, false if it does not.
-   */
-  public boolean contains(ArbitraryType target);
 
   /**
    *
