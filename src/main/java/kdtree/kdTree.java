@@ -24,10 +24,6 @@ public class kdTree<T> implements kdInterface<T>{
     return null;
   }
 
-  @Override
-  public boolean contains(T target) {
-    return false;
-  }
 
   @Override
   public int size() {
