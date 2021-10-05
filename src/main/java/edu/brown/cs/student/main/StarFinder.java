@@ -17,9 +17,9 @@ public class StarFinder {
   private static StarFinder instance = null;
 
   //kdTree optimizations
-  private ArrayList<kdGetter<Star>> starGetters = new ArrayList<>();
+  private final ArrayList<kdGetter<Star>> starGetters = new ArrayList<>();
 
-  private kdTree<Star> kdt = new kdTree();
+  private final kdTree<Star> kdt = new kdTree<Star>();
 
   //from: https://stackoverflow.com/questions/4419810/how-to-share-data-between-separate-classes-in-java
   //Basically, this lets both Star and NearestNeighbor share the same instance of this class

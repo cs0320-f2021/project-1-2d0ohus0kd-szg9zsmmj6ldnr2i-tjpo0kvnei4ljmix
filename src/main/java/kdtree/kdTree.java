@@ -138,9 +138,9 @@ public class kdTree<T> implements kdInterface<T> {
   }
 
   private void sortByDim(ArrayList<kdItem<T>> data, int dim) {
-    data.sort(new Comparator<kdItem>() {
+    data.sort(new Comparator<kdItem<T>>() {
       @Override
-      public int compare(kdItem o1, kdItem o2) {
+      public int compare(kdItem<T> o1, kdItem<T> o2) {
         if (o1.getDimension(dim) > o2.getDimension(dim)) {
           return 1;
         }
@@ -194,12 +194,12 @@ public class kdTree<T> implements kdInterface<T> {
     }
     kdItem<T> target = new kdItem<>(targetRaw, dims);
     kdItem<T>[] best = new kdItem[n];
-    Stack<Pair<kdItem, Double>> toCheck = new Stack<>();
+    Stack<Pair<kdItem<T>, Double>> toCheck = new Stack<>();
     assert (this.root != null);
     double distanceThreshold = Double.MAX_VALUE;
     toCheck.push(new Pair<>(this.root, distanceThreshold));
     while (!(toCheck.empty())) {
-      kdItem currItem = toCheck.pop().first;
+      kdItem<T> currItem = toCheck.pop().first;
       int currDim = currItem.getChildrenSortDim();
       int idealSide = target.getDimension(currDim) < currItem.getDimension(currDim) ? 0 : 1;
       // If the target's value is less than current, go left (0), otherwise right (1)
@@ -243,8 +243,8 @@ public class kdTree<T> implements kdInterface<T> {
    * @param best array to mutate
    * @return new best distance
    */
-  private double bubbleIntoArray(kdItem[] best, kdItem toInsert) {
-    kdItem bubble = toInsert;
+  private double bubbleIntoArray(kdItem<T>[] best, kdItem<T> toInsert) {
+    kdItem<T> bubble = toInsert;
     for (int idx = 0; idx < best.length; idx++) {
       if (best[idx] == null) {
         //array is not yet fully filled
@@ -252,7 +252,7 @@ public class kdTree<T> implements kdInterface<T> {
         return Double.MAX_VALUE;
       }
       if (best[idx].getDistance() > bubble.getDistance()) {
-        kdItem tmp = best[idx];
+        kdItem<T> tmp = best[idx];
         best[idx] = bubble;
         bubble = tmp;
       }
@@ -315,7 +315,8 @@ public class kdTree<T> implements kdInterface<T> {
     return count + 1;
   }
 
-  private class kdItem<kdObject> { //Just a dumb data-holding class
+  @SuppressWarnings("InnerClassMayBeStatic") //It can't be Static, IntelliJ is just being dumb
+  class kdItem<kdObject> {
     private final kdObject originalItem;
     private final double[] dimensions;
     private final kdItem<kdObject>[] children = new kdItem[2];
@@ -351,13 +352,12 @@ public class kdTree<T> implements kdInterface<T> {
       this.childrenSortDim = childrenSortDim;
     }
 
-    public double calcDistance(double[] otherDims) {
+    public void calcDistance(double[] otherDims) {
       double dist = 0;
       for (int dim = 0; dim < this.dimensions.length; dim++) {
         dist += Math.pow((this.dimensions[dim] - otherDims[dim]), 2);
       }
       this.distance = dist;
-      return dist;
     }
 
     public double getDistance() {
