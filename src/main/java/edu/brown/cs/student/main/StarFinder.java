@@ -1,15 +1,25 @@
 package edu.brown.cs.student.main;
 
+import kdtree.kdGetter;
+import kdtree.kdTree;
+import org.checkerframework.checker.units.qual.A;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 
 public class StarFinder {
   private boolean invalid = true; //true until stars are loaded
   private ArrayList<Star> starData;
   private static StarFinder instance = null;
+
+  //kdTree optimizations
+  private ArrayList<kdGetter<Star>> starGetters = new ArrayList<>();
+
+  private kdTree<Star> kdt = new kdTree();
 
   //from: https://stackoverflow.com/questions/4419810/how-to-share-data-between-separate-classes-in-java
   //Basically, this lets both Star and NearestNeighbor share the same instance of this class
@@ -24,7 +34,26 @@ public class StarFinder {
    * Constructor for the StarFinder class.
    */
   public StarFinder() {
+    this.starGetters.add(new kdGetter<Star>() {
+      @Override
+      public double getValue(Star elm) {
+        return elm.getX();
+      }
+    });
 
+    this.starGetters.add(new kdGetter<Star>() {
+      @Override
+      public double getValue(Star elm) {
+        return elm.getY();
+      }
+    });
+
+    this.starGetters.add(new kdGetter<Star>() {
+      @Override
+      public double getValue(Star elm) {
+        return elm.getZ();
+      }
+    });
   }
 
   public boolean isInvalid() {
@@ -84,6 +113,9 @@ public class StarFinder {
       String properName = rawStarData[1];
       starData.add(new Star(id, properName, x, y, z));
     }
+
+    this.kdt.loadData(this.starData, this.starGetters, false);
+
     return "Read " + this.starData.size() + " stars from " + path;
     //System.out.println("The first star is named " + starData.get(0).getName());
   }
@@ -110,8 +142,14 @@ public class StarFinder {
       //return new ArrayList<>();
 
       //Instead of erroring, just reduce to the maximum size
-      return this.knn(starData.size(), x, y, z);
+      return this.knn(kdt.size(), x, y, z);
     }
+
+    //use the kdt
+
+    return (ArrayList<Star>) kdt.nearestNeighbors(k, new Star(0, "Doesn't Matter", x, y, z));
+
+    /*
     //Make a copy of the starData, fill in distances, then sort by distance.
     ArrayList<Star> sortedStarData = new ArrayList<>(this.starData);
     for (Star s : sortedStarData) {
@@ -158,6 +196,7 @@ public class StarFinder {
       assert results.size() == k;
     }
     return results;
+    */
   }
 
   /**
