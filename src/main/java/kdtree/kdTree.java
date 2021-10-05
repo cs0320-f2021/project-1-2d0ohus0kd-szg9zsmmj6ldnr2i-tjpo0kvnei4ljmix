@@ -256,11 +256,6 @@ public class kdTree<T> implements kdInterface<T> {
   }
 
   @Override
-  public boolean contains(T target) {
-    return nearestNeighbors(1, target).get(0).equals(target);
-  }
-
-  @Override
   public int size() {
     return this.size;
   }
