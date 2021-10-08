@@ -15,7 +15,8 @@ import com.google.common.collect.ImmutableMap;
 
 import edu.brown.cs.student.main.commands.Add;
 import edu.brown.cs.student.main.commands.LoadStars;
-import edu.brown.cs.student.main.commands.NearestNeighbor;
+import edu.brown.cs.student.main.commands.NearestNeighborKD;
+import edu.brown.cs.student.main.commands.NearestNeighborNaive;
 import edu.brown.cs.student.main.commands.Subtract;
 import edu.brown.cs.student.main.commands.TestCommand;
 import edu.brown.cs.student.main.commands.loadtmp;
@@ -70,8 +71,8 @@ public final class Main {
     }
 
     ArrayList<Command> commands = new ArrayList<Command>(Arrays.asList(
-        new Add(), new Subtract(), new LoadStars(), new NearestNeighbor(),
-        new loadtmp(), new TestCommand()
+        new Add(), new Subtract(), new LoadStars(), new NearestNeighborNaive(),
+        new loadtmp(), new TestCommand(), new NearestNeighborKD()
     ));
     Command previousCommand = null;
     boolean help = false;

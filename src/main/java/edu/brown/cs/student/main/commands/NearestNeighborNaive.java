@@ -7,10 +7,11 @@ import edu.brown.cs.student.main.StarFinderNaive;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
-public class NearestNeighbor extends Command {
+public class NearestNeighborNaive extends Command {
 
-  public NearestNeighbor() {
+  public NearestNeighborNaive() {
     super(new HashSet<String>(Arrays.asList("naive_neighbors")));
   }
 
@@ -50,7 +51,7 @@ public class NearestNeighbor extends Command {
     }
   }
 
-  private String printStarResults(ArrayList<Star> stars) {
+  public static String printStarResults(List<Star> stars) {
     if (stars.size() == 0) {
       //This is the return when an error occurs in the knn function
       //Stay silent, an error message has already been printed from knn
