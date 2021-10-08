@@ -1,4 +1,8 @@
-package edu.brown.cs.student.main;
+package edu.brown.cs.student.main.commands;
+
+import edu.brown.cs.student.main.Command;
+import edu.brown.cs.student.main.Star;
+import edu.brown.cs.student.main.StarFinderNaive;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +27,7 @@ public class NearestNeighbor extends Command {
         return error("ERROR: Unable to parse input. Make sure the star name "
             + "is in quotes, and that 'k' is a number.");
       }
-      return this.printStarResults(StarFinder.getInstance().namedKnn(k, name));
+      return this.printStarResults(StarFinderNaive.getInstance().namedKnn(k, name));
     } else if (args.length == 4) {
       //formatted as 'naive_neighbors <k> <x> <y> <z>'
       int k;
@@ -36,7 +40,7 @@ public class NearestNeighbor extends Command {
       } catch (Exception e) {
         return error("Unable to parse input.");
       }
-      return this.printStarResults(StarFinder.getInstance().knn(k, x, y, z));
+      return this.printStarResults(StarFinderNaive.getInstance().knn(k, x, y, z));
     } else {
       //formatted wrong
       String output = "ERROR: Please follow one of the following formats:";

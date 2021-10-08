@@ -39,7 +39,7 @@ public abstract class Command {
    *
    * @return output to print to the user
    */
-  abstract String run(String argString);
+  public abstract String run(String argString);
 
   public String help() {
     return "This command has no help documentation";

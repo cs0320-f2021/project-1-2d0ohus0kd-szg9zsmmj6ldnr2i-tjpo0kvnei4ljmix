@@ -1,5 +1,6 @@
-package edu.brown.cs.student.main;
+package edu.brown.cs.student.main.commands;
 
+import edu.brown.cs.student.main.Command;
 import kdtree.kdGetter;
 import kdtree.kdTree;
 import org.checkerframework.checker.units.qual.A;
@@ -10,9 +11,9 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.function.Function;
 
-public class load extends Command{
+public class loadtmp extends Command {
 
-  public load() {
+  public loadtmp() {
     super(new HashSet<String>(Arrays.asList("loadtmp")));
   }
 

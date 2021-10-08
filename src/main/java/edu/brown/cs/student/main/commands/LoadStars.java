@@ -1,4 +1,7 @@
-package edu.brown.cs.student.main;
+package edu.brown.cs.student.main.commands;
+
+import edu.brown.cs.student.main.Command;
+import edu.brown.cs.student.main.StarFinderNaive;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,7 +13,7 @@ public class LoadStars extends Command {
   }
 
   public String run(String arg) {
-    return StarFinder.getInstance().loadStars(arg);
+    return StarFinderNaive.getInstance().loadStars(arg);
   }
 
 }

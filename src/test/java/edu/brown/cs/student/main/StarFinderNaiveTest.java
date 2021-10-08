@@ -3,16 +3,15 @@ package edu.brown.cs.student.main;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class StarFinderTest {
+public class StarFinderNaiveTest {
 
-  StarFinder gsf = new StarFinder(); // global starfinder used in some tests, tests reloading data
+  StarFinderNaive gsf = new StarFinderNaive(); // global starfinder used in some tests, tests reloading data
 
   /**
    * @param l1 first list to compare
@@ -42,7 +41,7 @@ public class StarFinderTest {
 
   @Test
   public void testInstantiation() {
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     assertTrue(sf.isInvalid());
   }
 
@@ -55,7 +54,7 @@ public class StarFinderTest {
 
   @Test
   public void testBadPath() {
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     sf.loadStars("data/stars/thisCSVisfake.lol");
     assertTrue(sf.isInvalid());
   }
@@ -63,14 +62,14 @@ public class StarFinderTest {
   @Test
   public void testBadHeader() {
     //test with corrupted CSV first line
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     sf.loadStars("data/test/no-header.csv");
     assertTrue(sf.isInvalid());
   }
 
   @Test
   public void testBadBody() {
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     sf.loadStars("data/test/corrupt-body.csv");
     assertTrue(sf.isInvalid());
   }
@@ -92,7 +91,7 @@ public class StarFinderTest {
   @Test
   public void testKnnCore() {
     //Core functionality of knn
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     sf.loadStars("data/stars/ten-star.csv");
     ArrayList<Star> result = sf.knn(10, 0,0, 0);
     ArrayList<Star> correct = new ArrayList<>(); //hardcoded correct answer
@@ -112,7 +111,7 @@ public class StarFinderTest {
   @Test
   public void testTooLargeK() {
     //Load 10 stars, ask for 11 nearest neighbors
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     sf.loadStars("data/stars/ten-star.csv");
     ArrayList<Star> result = sf.knn(11, 0,0, 0);
     assertEquals(10, result.size()); //size is reduced to max available
@@ -122,7 +121,7 @@ public class StarFinderTest {
   @Test
   public void testKnnInvalidData() {
     //try calling knn before loading data
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     ArrayList<Star> result = sf.knn(3, 1, 2, 3);
     assertEquals(0, result.size());
   }
@@ -150,7 +149,7 @@ public class StarFinderTest {
 
   @Test
   public void testSmallList() {
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     sf.loadStars("data/stars/ten-star.csv");
     ArrayList<Star> result = sf.knn(3, 0,0, 0);
     ArrayList<Star> correct = new ArrayList<>(); //hardcoded correct answer
@@ -209,7 +208,7 @@ public class StarFinderTest {
 
   @Test
   public void testNamedKnnCore() {
-    StarFinder sf = new StarFinder();
+    StarFinderNaive sf = new StarFinderNaive();
     sf.loadStars("data/stars/stardata.csv");
     ArrayList<Star> stars = new ArrayList<>();
     stars.add(new Star(58708,"Noreen_8",-716.19999,-14.46457,573.17391));

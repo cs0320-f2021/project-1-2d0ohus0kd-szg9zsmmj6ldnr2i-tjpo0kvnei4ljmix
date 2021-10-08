@@ -13,6 +13,12 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
+import edu.brown.cs.student.main.commands.Add;
+import edu.brown.cs.student.main.commands.LoadStars;
+import edu.brown.cs.student.main.commands.NearestNeighbor;
+import edu.brown.cs.student.main.commands.Subtract;
+import edu.brown.cs.student.main.commands.TestCommand;
+import edu.brown.cs.student.main.commands.loadtmp;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -65,7 +71,7 @@ public final class Main {
 
     ArrayList<Command> commands = new ArrayList<Command>(Arrays.asList(
         new Add(), new Subtract(), new LoadStars(), new NearestNeighbor(),
-        new load(), new TestCommand()
+        new loadtmp(), new TestCommand()
     ));
     Command previousCommand = null;
     boolean help = false;
