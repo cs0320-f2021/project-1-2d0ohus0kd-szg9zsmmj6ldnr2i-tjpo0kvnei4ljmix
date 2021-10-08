@@ -3,14 +3,14 @@ package api.core;
 import java.util.Objects;
 
 public class Justrent {
-    String fit;
-    String user_id;
-    String item_id;
-    int rating;
-    String rented_for;
-    String category;
-    int size;
-    int id;
+    private String fit;
+    private String user_id;
+    private String item_id;
+    private int rating;
+    private String rented_for;
+    private String category;
+    private int size;
+    private int id;
 
     @Override
     public String toString() {
@@ -46,5 +46,69 @@ public class Justrent {
     @Override
     public int hashCode() {
         return Objects.hash(fit, user_id, item_id, rating, rented_for, category, size, id);
+    }
+
+    public String getFit() {
+        return fit;
+    }
+
+    public void setFit(String fit) {
+        this.fit = fit;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getItem_id() {
+        return item_id;
+    }
+
+    public void setItem_id(String item_id) {
+        this.item_id = item_id;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public String getRented_for() {
+        return rented_for;
+    }
+
+    public void setRented_for(String rented_for) {
+        this.rented_for = rented_for;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
