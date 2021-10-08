@@ -8,6 +8,6 @@ public class apiImplementationTest {
 
     @Test
     public void testGetFromJson() {
-        
+
     }
 }
