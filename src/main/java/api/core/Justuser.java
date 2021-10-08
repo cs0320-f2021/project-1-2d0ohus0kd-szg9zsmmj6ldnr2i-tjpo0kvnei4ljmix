@@ -1,4 +1,4 @@
-package api.project1;
+package api.core;
 
 public class Justuser {
     String user_id;

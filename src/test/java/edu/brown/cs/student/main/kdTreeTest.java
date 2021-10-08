@@ -12,7 +12,7 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class kdTest {
+public class kdTreeTest {
 
     //global kdTree used in some tests, tests reloading data
     kdTree gkd = new kdTree();
@@ -167,7 +167,7 @@ public class kdTest {
             assertEquals(gkd.nearestNeighborsExcludingCenter(2, star5),Arrays.asList(star4, star6));
 
             //equal distance between >n stars
-            assertEquals(gkd.nearestNeighborsExcludingCenter(2, star4), Arrays.asList(star3, star8)),;
+            assertEquals(gkd.nearestNeighborsExcludingCenter(2, star4), Arrays.asList(star3, star8));
 
             //fewer than 'n' nodes in the tree --> return all nodes (except for the one inputted)
             assertEquals(gkd.nearestNeighborsExcludingCenter(500, star4), Arrays.asList(star1, star2, star3, star5, star6, star7, star8, star9));

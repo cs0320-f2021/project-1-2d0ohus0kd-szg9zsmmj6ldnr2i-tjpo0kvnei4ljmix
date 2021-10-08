@@ -1,4 +1,4 @@
-package api.project1;
+package api.core;
 
 import api.client.ApiClient;
 import api.client.ClientRequestGenerator;

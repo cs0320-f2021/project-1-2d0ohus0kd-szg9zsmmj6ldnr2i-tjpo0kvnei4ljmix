@@ -1,8 +1,7 @@
-package api.project1;
+package api.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import api.core.FileParser;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
