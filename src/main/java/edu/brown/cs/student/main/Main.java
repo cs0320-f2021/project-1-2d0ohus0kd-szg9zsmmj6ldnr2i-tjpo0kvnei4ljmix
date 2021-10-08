@@ -20,6 +20,7 @@ import edu.brown.cs.student.main.commands.NearestNeighborNaive;
 import edu.brown.cs.student.main.commands.Subtract;
 import edu.brown.cs.student.main.commands.TestCommand;
 import edu.brown.cs.student.main.commands.loadtmp;
+import edu.brown.cs.student.main.commands.usersCommand;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -72,7 +73,8 @@ public final class Main {
 
     ArrayList<Command> commands = new ArrayList<Command>(Arrays.asList(
         new Add(), new Subtract(), new LoadStars(), new NearestNeighborNaive(),
-        new loadtmp(), new TestCommand(), new NearestNeighborKD()
+        new loadtmp(), new TestCommand(), new NearestNeighborKD(), new usersCommand()
+
     ));
     Command previousCommand = null;
     boolean help = false;
