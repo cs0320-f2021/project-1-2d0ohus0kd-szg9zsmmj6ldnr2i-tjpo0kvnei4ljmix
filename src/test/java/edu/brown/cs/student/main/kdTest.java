@@ -14,18 +14,17 @@ import static org.junit.Assert.assertEquals;
 
 public class kdTest {
 
-    kdTree gkd = new kdTree(); //global kdTree used in some tests, tests reloading data
+    //global kdTree used in some tests, tests reloading data
+    kdTree gkd = new kdTree();
 
-    //Test whether kdTree was constructed properly
 
-    //
-
+    //generate an ArrayList with numToGenerate stars
     private ArrayList<Star> generateStars(int numToGenerate) {
         ArrayList<Star> starList = new ArrayList<>();
         Random r = new Random();
         for (int i = 0; i < numToGenerate; i++) {
-            Star newstar = new Star(i, "StarNumber: " + i, r.nextDouble() * 1000, r.nextDouble() * 1000, r.nextDouble() * 1000);
-            starList.add(newstar);
+            Star newStar = new Star(i, "StarNumber: " + i, r.nextDouble() * 1000, r.nextDouble() * 1000, r.nextDouble() * 1000);
+            starList.add(newStar);
         }
         return starList;
     }
@@ -50,12 +49,14 @@ public class kdTest {
         Star star7 = new Star(7, "seventh", 0, 0, 14);
         Star star8 = new Star(8, "eight", 0, 0, 9);
         Star star9 = new Star(9, "nine", 0, 0, 9);
+
+        //from star-1 to start10, star10 is the furthest star from 0,0,0 because the values get normalized
         Star star10 = new Star(10, "nine", 1, 0, 1);
-        //This is the furthest star from 0,0,0 because the values get normalized
 
         ArrayList<Star> starList = new ArrayList<>(
             Arrays.asList(star1, star2, star3, star4, star5, star6, star7, star8, star9, star10));
 
+        //a lit of getters, one for each coordinate (x, y, z)
         ArrayList<kdGetter<Star>> starGetters = new ArrayList<>();
         kdGetter<Star> xGetter = new kdGetter<Star>() {
             @Override
@@ -78,14 +79,17 @@ public class kdTest {
             }
         };
 
+
+        //adding each coordinate getter to the starGetters list.
         starGetters.add(xGetter);
         starGetters.add(yGetter);
         starGetters.add(zGetter);
 
+        //loading a starList and starGetters to our global kdTree
         gkd.loadData(starList, starGetters);
 
         //I want to search around 50,50,50
-        gkd.nearestNeighbors(4, new Star(0 ,"", 50, 50, 50));
+        assertEquals(gkd.nearestNeighbors(4, new Star(0 ,"", 50, 50, 50)),star10);
 
         //straightforward case
         assertEquals(gkd.nearestNeighbors(2, star2),Arrays.asList(star2, star1));
@@ -103,6 +107,10 @@ public class kdTest {
         assertEquals(gkd.nearestNeighborsExcludingCenter(0, star4), Arrays.asList());
         //non-existent coordinates -->
         assertEquals(gkd.nearestNeighborsExcludingCenter(2, new Star(11, "not in tree", 0, 0, 1000)), Arrays.asList(star7,star6));
+
+        generateStars(1000000000);
+        System.out.println(starList);
+//        gkd.loadData(starList, starGetters);
     }
 
         public void testNearestNeighborsExcludingCenter() {
@@ -171,13 +179,9 @@ public class kdTest {
             assertEquals(gkd.nearestNeighborsExcludingCenter(2, new Star(10, "not in tree", 1, 1, 1)), Arrays.asList(star10));
 
         }
-        public void testGetAll() {
+//        public void testGetAll() {
+//
+//        //for empty kdtree
+//            assertEquals();
 
-        //for empty kdtree
-            assertEquals();
-
-
-//test nearestneighbors with a bunch of different element numbers. weirdest inputs possible.
-
-        }
 }
