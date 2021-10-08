@@ -8,23 +8,25 @@ import org.checkerframework.checker.units.qual.A;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 
 public class loadtmp extends Command {
 
   public loadtmp() {
-    super(new HashSet<String>(Arrays.asList("loadtmp")));
+    super(new HashSet<String>(List.of("loadtmp")));
   }
 
   @Override
   public String run(String argString) {
     int numPeople = Integer.parseInt(argString);
-    kdTree kd = new kdTree();
+    kdTree<dummyPerson> kd = new kdTree<dummyPerson>();
     ArrayList<dummyPerson> people = new ArrayList<>();
     Random rng = new Random();
     for (int i = 0; i < numPeople; i++) {
-      people.add(new dummyPerson(rng.nextDouble() * 123, rng.nextDouble() * 456, rng.nextDouble() * 789));
+      people.add(
+          new dummyPerson(rng.nextDouble() * 123, rng.nextDouble() * 456, rng.nextDouble() * 789));
     }
 
     ArrayList<kdGetter<dummyPerson>> getters = new ArrayList<>(3);
@@ -49,7 +51,7 @@ public class loadtmp extends Command {
     });
 
     kd.loadData(people, getters);
-    System.out.println(kd.nearestNeighbors(5, new dummyPerson(100,400, 700)));
+    System.out.println(kd.nearestNeighbors(5, new dummyPerson(100, 400, 700)));
     return kd.toString();
   }
 
