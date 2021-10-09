@@ -9,14 +9,13 @@ import java.util.HashSet;
 public class Subtract extends Command {
 
   public Subtract() {
-    super(new HashSet<String>(Arrays.asList("subtract")));
   }
 
   public String run(String arg) {
     //Make sure there are only two numbers to add
     String[] args = arg.split(" ");
     if (args.length != 2) { //Artificial restriction, this could be removed without issues.
-      return error("Incorrect number of arguments");
+      return "ERROR: Incorrect number of arguments";
     }
     //Now, make sure that the other two arguments are actually numbers
     ArrayList<Double> nums = new ArrayList<>();
@@ -27,7 +26,7 @@ public class Subtract extends Command {
         num = Double.parseDouble(s);
         nums.add(num);
       } catch (Exception e) {
-        return error("Unable to convert \"" + s + "\" to a number");
+        return "ERROR: Unable to convert \"" + s + "\" to a number";
       }
     }
     double result = nums.get(0);

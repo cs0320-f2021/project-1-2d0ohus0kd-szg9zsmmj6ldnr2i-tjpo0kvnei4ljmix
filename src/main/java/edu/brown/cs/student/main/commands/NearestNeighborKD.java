@@ -13,7 +13,6 @@ import java.util.List;
 public class NearestNeighborKD extends Command {
 
   public NearestNeighborKD() {
-    super(new HashSet<String>(Arrays.asList("neighbors")));
   }
 
   public String run(String arg) {
@@ -26,8 +25,8 @@ public class NearestNeighborKD extends Command {
         k = Integer.parseInt(args[0]);
         name = arg.split("\"")[1];
       } catch (Exception e) {
-        return error("ERROR: Unable to parse input. Make sure the star name "
-            + "is in quotes, and that 'k' is a number.");
+        return "ERROR: Unable to parse input. Make sure the star name "
+            + "is in quotes, and that 'k' is a number.";
       }
       return this.printStarResults(StarFinderKD.getInstance().namedKnn(k, name));
     } else if (args.length == 4) {
@@ -40,7 +39,7 @@ public class NearestNeighborKD extends Command {
         y = Double.parseDouble(args[2]);
         z = Double.parseDouble(args[3]);
       } catch (Exception e) {
-        return error("Unable to parse input.");
+        return "ERROR: Unable to parse input.";
       }
       return this.printStarResults(StarFinderKD.getInstance().knn(k, x, y, z));
     } else {

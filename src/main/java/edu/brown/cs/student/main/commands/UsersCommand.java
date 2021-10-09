@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class usersCommand extends Command {
+public class UsersCommand extends Command {
   private final Aggregator aggregator;
   private final JsonParser jp;
   private final kdTree<Justrent> rentTree;
@@ -47,8 +47,7 @@ public class usersCommand extends Command {
       }
   );
 
-  public usersCommand() {
-    super(new HashSet<String>(List.of("users")));
+  public UsersCommand() {
     this.aggregator = new Aggregator();
     this.jp = new JsonParser();
     this.rentTree = new kdTree<>();
