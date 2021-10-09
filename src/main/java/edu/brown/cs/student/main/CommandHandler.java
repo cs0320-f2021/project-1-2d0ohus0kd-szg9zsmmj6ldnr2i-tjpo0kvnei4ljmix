@@ -22,7 +22,7 @@ public class CommandHandler {
       "neighbors", new NearestNeighborKD(),
       "naive_neighbors", new NearestNeighborNaive(),
       "users", new UsersCommand()
-      //Add new commands here
+      //Add new commands here (Or remove old commands if needed)
   ));
 
   /**
@@ -45,5 +45,14 @@ public class CommandHandler {
    */
   public static HashMap<String, Command> getCommands() {
     return commands;
+  }
+
+  /** Essentially a wrapper for the Map.remove method
+   *
+   * @param commandName name of the command to remove.
+   * @return the value of the command that was removed, or null if no command of that name exists.
+   */
+  public static Command removeCommand(String commandName) {
+    return commands.remove(commandName);
   }
 }
