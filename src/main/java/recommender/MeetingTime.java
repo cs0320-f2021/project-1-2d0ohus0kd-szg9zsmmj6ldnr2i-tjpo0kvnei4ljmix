@@ -1,0 +1,5 @@
+package recommender;
+
+public enum MeetingTime {
+  EARLY_MORNING, LATE_MORNING, EARLY_AFTERNOON, LATE_AFTERNOON, EVENING, NIGHT, LATE_NIGHT
+}
