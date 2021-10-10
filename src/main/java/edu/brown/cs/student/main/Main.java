@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -63,23 +64,17 @@ public final class Main {
       runSparkServer((int) options.valueOf("port"));
     }
 
-    ArrayList<Command> commands = new ArrayList<>(Arrays.asList(
-        new Add(), new Subtract(), new LoadStars(), new NearestNeighbor()
-    ));
+    //Setup commands
+    HashMap<String, Command> commands = CommandHandler.getCommands();
     Command previousCommand = null;
     boolean help = false;
 
     //Sanity check, make sure no name is repeated twice, and make sure isActive is false.
-    HashSet<String> allNames = new HashSet<>();
-    for (Command c : commands) {
-      if (c.isActive()) {
-        System.out.println("ERROR: " + c + " is active when initializing!");
-      }
-      for (String s : c.getNames()) {
-        if (!allNames.add(s)) {
-          //returns false if the string already exists in the set
-          System.out.println("ERROR: Duplicate name '" + s + "' detected!");
-        }
+    for (Map.Entry<String, Command> entry : commands.entrySet()) {
+      String commandName = entry.getKey();
+      Command commandInstance = entry.getValue();
+      if (commandInstance.isActive()) {
+        System.out.println("ERROR: Command " + commandName + " is active when initializing!");
       }
     }
 
@@ -97,7 +92,7 @@ public final class Main {
       }
       input = input.trim(); //Trim input, getting rid of extra spaces
       String[] arguments = input.split(" ", 2); //Split into two pieces
-      String commandName = arguments[0].toLowerCase(); //REPL is case-insensitive
+      String commandNameToFind = arguments[0].toLowerCase(); //REPL is case-insensitive
       String commandArgs;
       try {
         commandArgs = arguments[1];
@@ -106,9 +101,11 @@ public final class Main {
         commandArgs = "";
       }
 
-      if (commandName.equals("quit")) {
+      if (commandNameToFind.equals("quit")) {
         //override everything else, if quit is entered deactivate the previous task.
-        previousCommand.deactivate();
+        if (previousCommand != null) {
+          previousCommand.deactivate();
+        }
         System.out.println("---");
         continue;
       }
@@ -122,34 +119,29 @@ public final class Main {
 
       //if the user types help, they're looking for documentation
       //switch up the arguments so that help is called
-      if (commandName.equals("help")) {
+      if (commandNameToFind.equals("help")) {
         help = true;
-        commandName = commandArgs; //In this case, the function we need to find is the argument
+        commandNameToFind =
+            commandArgs; //In this case, the function we need to find is the argument
       }
 
-      //Loop through all commands to see if one matches
-      boolean found = false;
-      for (Command c : commands) {
-        if (c.getNames().contains(commandName)) {
-          //This is the command we should run
-          found = true;
-          if (help) {
-            //call the help command
-            System.out.println(c.help());
-            help = false;
-          } else {
-            //call the standard run method
-            String output = c.run(commandArgs);
-            if (!(output.isEmpty())){
-              System.out.println(output);
-            }
-            previousCommand = c;
-          }
-          break;
-        }
-      }
-      if (!found) {
+      //Find matching command
+      Command commandToRun = commands.get(commandNameToFind);
+      if (commandToRun == null) {
         System.out.println("ERROR: Unrecognized command");
+        continue;
+      }
+      if (help) {
+        //call the help command
+        System.out.println(commandToRun.help());
+        help = false;
+      } else {
+        //call the standard run method
+        String output = commandToRun.run(commandArgs);
+        if (!(output.isEmpty())) {
+          System.out.println(output);
+        }
+        previousCommand = commandToRun;
       }
     }
   }

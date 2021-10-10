@@ -25,6 +25,17 @@ public class Star {
     this.z = z;
   }
 
+  @Override
+  public String toString() {
+    return "Star{" +
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", x=" + x +
+        ", y=" + y +
+        ", z=" + z +
+        '}';
+  }
+
   public int getId() {
     return this.id;
   }

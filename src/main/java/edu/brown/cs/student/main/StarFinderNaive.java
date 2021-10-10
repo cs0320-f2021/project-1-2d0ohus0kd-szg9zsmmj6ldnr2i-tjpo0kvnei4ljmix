@@ -5,17 +5,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
-public class StarFinder {
+public class StarFinderNaive {
   private boolean invalid = true; //true until stars are loaded
   private ArrayList<Star> starData;
-  private static StarFinder instance = null;
+  private static StarFinderNaive instance = null;
 
   //from: https://stackoverflow.com/questions/4419810/how-to-share-data-between-separate-classes-in-java
   //Basically, this lets both Star and NearestNeighbor share the same instance of this class
-  public static StarFinder getInstance() {
+  public static StarFinderNaive getInstance() {
     if (instance == null) {
-      instance = new StarFinder();
+      instance = new StarFinderNaive();
     }
     return instance;
   }
@@ -23,8 +24,7 @@ public class StarFinder {
   /**
    * Constructor for the StarFinder class.
    */
-  public StarFinder() {
-
+  public StarFinderNaive() {
   }
 
   public boolean isInvalid() {
@@ -84,6 +84,7 @@ public class StarFinder {
       String properName = rawStarData[1];
       starData.add(new Star(id, properName, x, y, z));
     }
+
     return "Read " + this.starData.size() + " stars from " + path;
     //System.out.println("The first star is named " + starData.get(0).getName());
   }
@@ -110,8 +111,9 @@ public class StarFinder {
       //return new ArrayList<>();
 
       //Instead of erroring, just reduce to the maximum size
-      return this.knn(starData.size(), x, y, z);
+      return this.knn(this.starData.size(), x, y, z);
     }
+
     //Make a copy of the starData, fill in distances, then sort by distance.
     ArrayList<Star> sortedStarData = new ArrayList<>(this.starData);
     for (Star s : sortedStarData) {

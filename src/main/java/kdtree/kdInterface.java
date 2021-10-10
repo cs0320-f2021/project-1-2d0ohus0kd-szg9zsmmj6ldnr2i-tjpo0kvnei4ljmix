@@ -28,6 +28,7 @@ interface kdInterface<ArbitraryType>{
    */
   public void loadData(Collection<ArbitraryType> dataToLoad, List<kdGetter<ArbitraryType>> getters);
 
+  public void loadData(Collection<ArbitraryType> dataToLoad, List<kdGetter<ArbitraryType>> getters, boolean normalize);
 
   /** Finds several nearest neighbors given a data point to start from
    *
