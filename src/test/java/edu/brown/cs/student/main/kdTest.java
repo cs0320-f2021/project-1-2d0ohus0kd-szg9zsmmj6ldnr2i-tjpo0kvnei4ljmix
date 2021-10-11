@@ -127,6 +127,10 @@ public class kdTest {
 
             Star star10 = new Star(10, "nine", 1, 0, 1);
 
+            //Comment: Getters and Setters (e.g. elm.age). instead of returning the reference of class-level objects,
+            //return copies of them.
+            //Comment: Replace ArrayList with List on the left side of these equations (as seen below, change).
+
             ArrayList<Star> starList = new ArrayList<>(
                     Arrays.asList(star1, star2, star3, star4, star5, star6, star7, star8, star9, star10));
 
