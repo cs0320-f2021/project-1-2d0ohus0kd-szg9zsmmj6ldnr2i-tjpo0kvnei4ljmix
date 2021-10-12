@@ -24,13 +24,13 @@ public class KDTest extends Command {
       new kdGetter<Student>() {
         @Override
         public double getValue(Student elm) {
-          return elm.id;
+          return elm.grade.getValue();
         }
       }
   );
 
   private Student randomStudent() {
-    return new Student(rnd.nextInt(), "PlaceholderName", rnd.nextBoolean(), Grade.THIRDYEAR,
+    return new Student(rnd.nextInt(), "PlaceholderName", rnd.nextBoolean(), Grade.valueOf(rnd.nextInt(7)),
         rnd.nextInt(12), Horoscope.CANCER, List.of(MeetingTime.LATE_AFTERNOON, MeetingTime.LATE_NIGHT),
         "English lol", "N/A", rnd.nextBoolean());
   }
@@ -45,13 +45,23 @@ public class KDTest extends Command {
 
   @Override
   public String run(String argString) {
-    String output = "";
-    int numStudents = Integer.parseInt(argString);
+    int numStudents = 0;
+    try {
+      numStudents = Integer.parseInt(argString);
+    } catch (NumberFormatException e) {
+      numStudents = 12;
+    }
     kdTree<Student> studentKD = new kdTree<>();
-    studentKD.loadData(randomStudentList(numStudents), studentGetters);
-    Student center = randomStudent();
-    output += "Searching around" + center.yearsExperience + ", " + center.id + "\n";
-    output += studentKD.nearestNeighbors(10, center);
-    return output;
+    List<Student> rsl = randomStudentList(numStudents);
+    studentKD.loadData(rsl, studentGetters);
+    for (Student s : rsl) {
+      System.out.println(s.yearsExperience + ", " + s.grade.getValue());
+    }
+    //Student center = randomStudent();
+    //System.out.println("Searching around" + center.yearsExperience + ", " + center.grade.getValue());
+    //System.out.println("---");
+    System.out.println(studentKD);
+    //System.out.println(studentKD.nearestNeighbors(10, center));
+    return "";
   }
 }
