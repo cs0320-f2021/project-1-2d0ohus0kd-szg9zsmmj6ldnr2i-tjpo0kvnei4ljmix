@@ -1,6 +1,6 @@
-package edu.brown.cs.student.stars;
+package edu.brown.cs.student.main;
 
-import edu.brown.cs.student.bloomfilter.BloomFilter;
+import bloomfilter.BloomFilter;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
