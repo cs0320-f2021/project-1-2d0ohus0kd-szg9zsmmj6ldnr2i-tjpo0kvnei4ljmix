@@ -32,6 +32,22 @@ public class Student {
   ^ Find people who are similar if the student is perferGroup (otherwise ignore)
    */
 
+  @Override
+  public String toString() {
+    return "Student{" +
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", meetsInPerson=" + meetsInPerson +
+        ", grade=" + grade +
+        ", yearsExperience=" + yearsExperience +
+        ", horoscope=" + horoscope +
+        ", meetingTimeList=" + meetingTimeList +
+        ", preferredLanguage='" + preferredLanguage + '\'' +
+        ", marginalizedGroup='" + marginalizedGroup + '\'' +
+        ", preferGroup=" + preferGroup +
+        '}';
+  }
+
   public String getName() {
     return name;
   }
