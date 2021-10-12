@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Recommender implements RecommenderInterface{
-  private List<kdGetter<Student>> studentGetters = List.of(
+  private final List<kdGetter<Student>> studentGetters = List.of(
       new kdGetter<Student>() {
         @Override
         public double getValue(Student elm) {
@@ -26,14 +26,13 @@ public class Recommender implements RecommenderInterface{
       }
   );
   private BloomFilterRecommender<Student> bloomfilterrec;
-  private kdTree<Student> kdt;
-  private HashMap<String, Student> studentMap;
+  private kdTree<Student> kdt = new kdTree<>();
+  private HashMap<String, Student> studentMap = new HashMap<>();
+  private int numStudents = 0;
 
 
   @Override
   public void add(Collection<Student> studentsToAdd) {
-    studentMap = new HashMap<>();
-    kdt = new kdTree<Student>();
     //Convert to map:
     for (Student s : studentsToAdd) {
       studentMap.put(String.valueOf(s.id), s); //Putting string because of Bloom Filter requirement
@@ -41,12 +40,15 @@ public class Recommender implements RecommenderInterface{
     //Load into kdTree
     kdt.loadData(studentsToAdd, studentGetters, true);
     //Load into Bloom Filter
-    bloomfilterrec = new BloomFilterRecommender<Student>(studentMap, 0.05);
+    bloomfilterrec = new BloomFilterRecommender<Student>(studentMap, 0.01);
 
   }
 
   @Override
   public List<Student> bestStudents(int studentID, int k) {
+    if (k > this.numStudents) {
+      k = this.numStudents;
+    }
     return kdt.nearestNeighbors(k, studentMap.get(String.valueOf(studentID)));
   }
 }
