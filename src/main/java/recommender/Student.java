@@ -1,8 +1,10 @@
 package recommender;
 
+import bloomfilter.Item;
+
 import java.util.List;
 
-public class Student {
+public class Student implements Item {
   public final int id;
   private String name;
   public final boolean meetsInPerson;
@@ -18,10 +20,9 @@ public class Student {
   How fields will be used for recommendations:
   id -> unused
   name -> unused
-  meetsInPerson -> kdTree
+  meetsInPerson -> bloomFilter
   ^ Find people who are the same
-  grade -> Bloom Filter, only a few options so it's categorical
-  ^ Find people who are different
+  grade -> kdTree
   yearsExperience -> kdTree because there's a large range of possible values
   ^ Find people who are different
   horoscope -> unused
@@ -47,6 +48,8 @@ public class Student {
         ", preferGroup=" + preferGroup +
         '}';
   }
+
+
 
   public String getName() {
     return name;
@@ -77,5 +80,20 @@ public class Student {
     this.preferredLanguage = preferredLanguage;
     this.marginalizedGroup = marginalizedGroup;
     this.preferGroup = preferGroup;
+  }
+
+  @Override
+  public List<String> getVectorRepresentation() {
+    //Return all the fields we want to go into the bloom filter
+    return List.of(
+        String.valueOf(this.meetsInPerson),
+        String.valueOf(this.meetingTimeList),
+        String.valueOf(this.marginalizedGroup)
+    );
+  }
+
+  @Override
+  public String getId() {
+    return String.valueOf(this.id);
   }
 }
