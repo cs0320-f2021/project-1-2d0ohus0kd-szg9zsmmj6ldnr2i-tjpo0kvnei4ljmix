@@ -27,22 +27,26 @@ public class Recommender implements RecommenderInterface{
   );
   private BloomFilterRecommender<Student> bloomfilterrec;
   private kdTree<Student> kdt;
+  private HashMap<String, Student> studentMap;
 
 
   @Override
   public void add(Collection<Student> studentsToAdd) {
-    //Load into kdTree
+    studentMap = new HashMap<>();
     kdt = new kdTree<Student>();
-    kdt.loadData(studentsToAdd, studentGetters, true);
-    //Convert to Hashmap for bloom filter
-    Map<String, Student> StudentMap = new HashMap<>();
+    //Convert to map:
     for (Student s : studentsToAdd) {
-      StudentMap.put(String.valueOf(s.id), s);
+      studentMap.put(String.valueOf(s.id), s); //Putting string because of Bloom Filter requirement
     }
+    //Load into kdTree
+    kdt.loadData(studentsToAdd, studentGetters, true);
+    //Load into Bloom Filter
+    bloomfilterrec = new BloomFilterRecommender<Student>(studentMap, 0.05);
+
   }
 
   @Override
   public List<Student> bestStudents(int studentID, int k) {
-    return null;
+    return kdt.nearestNeighbors(k, studentMap.get(String.valueOf(studentID)));
   }
 }
