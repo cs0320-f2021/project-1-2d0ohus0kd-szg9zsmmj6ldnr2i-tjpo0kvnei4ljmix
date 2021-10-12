@@ -1,6 +1,7 @@
 package edu.brown.cs.student.main;
 
 import edu.brown.cs.student.main.commands.Add;
+import edu.brown.cs.student.main.commands.KDTest;
 import edu.brown.cs.student.main.commands.LoadStars;
 import edu.brown.cs.student.main.commands.NearestNeighborKD;
 import edu.brown.cs.student.main.commands.NearestNeighborNaive;
@@ -21,7 +22,8 @@ public class CommandHandler {
       "stars", new LoadStars(),
       "neighbors", new NearestNeighborKD(),
       "naive_neighbors", new NearestNeighborNaive(),
-      "users", new UsersCommand()
+      "users", new UsersCommand(),
+      "testkd", new KDTest()
       //Add new commands here (Or remove old commands if needed)
   ));
 
