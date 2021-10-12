@@ -23,7 +23,7 @@ public class CommandHandler {
       "neighbors", new NearestNeighborKD(),
       "naive_neighbors", new NearestNeighborNaive(),
       "users", new UsersCommand(),
-      "testkd", new KDTest()
+      "kdtest", new KDTest()
       //Add new commands here (Or remove old commands if needed)
   ));
 

@@ -186,11 +186,8 @@ public class kdTree<T> implements kdInterface<T> {
     double[] dims = new double[this.numDims];
     for (int i = 0; i < this.numDims; i++) {
       dims[i] = this.normalizeSingleValue(this.kdGetters.get(i).getValue(targetRaw), i);
-      //Sanity check to make sure normalization went well
-      if (this.normalize){
-        assert dims[i] >= 0;
-        assert dims[i] <= 1;
-      }
+      //In this case, it's actually okay that if the normalized value is above 1 (or negative)
+      //Because the target value might be more extreme than any of the kdtree data
     }
     kdItem<T> target = new kdItem<>(targetRaw, dims);
     kdItem<T>[] best = new kdItem[n];
