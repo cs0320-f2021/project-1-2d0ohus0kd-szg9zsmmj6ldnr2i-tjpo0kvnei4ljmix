@@ -32,7 +32,8 @@ public class KDTest extends Command {
   private Student randomStudent() {
     return new Student(rnd.nextInt(), "PlaceholderName", rnd.nextBoolean(), Grade.THIRDYEAR,
         rnd.nextInt(12), Horoscope.CANCER, List.of(MeetingTime.LATE_AFTERNOON, MeetingTime.LATE_NIGHT),
-        "English lol", "N/A", rnd.nextBoolean());
+        "English lol", "N/A", rnd.nextBoolean(), rnd.nextInt(10), rnd.nextInt(10), rnd.nextInt(10),
+        rnd.nextInt(10), rnd.nextInt(10), rnd.nextInt(10), List.of("Coding"), List.of("Testing"), List.of("Thinking"));
   }
 
   private List<Student> randomStudentList(int n) {
