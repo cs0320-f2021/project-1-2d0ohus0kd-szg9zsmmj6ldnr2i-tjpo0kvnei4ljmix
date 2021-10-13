@@ -120,6 +120,7 @@ public class kdTree<T> implements kdInterface<T> {
   }
 
   private void constructTree(kdItem<T> rootNode, List<kdItem<T>> remainingItems, int dim) {
+    assert (rootNode.getChildrenSortDim() == dim);
     double rootVal = rootNode.getDimension(dim);
     //Partition the space into left and right sides with the rootVal being the separator
     List<kdItem<T>> leftSide = new ArrayList<>();
@@ -131,15 +132,15 @@ public class kdTree<T> implements kdInterface<T> {
         rightSide.add(currItem);
       }
     }
-    //Now, sort both sides, and the midpoint of each sorted side should be a child on that side.
 
+    int nextdim = (dim + 1) % this.numDims;
     if (!leftSide.isEmpty()){
       sortByDim(leftSide, dim);
       kdItem<T> leftChild = leftSide.get(leftSide.size() / 2);
-      leftChild.setChildrenSortDim(dim);
+      leftChild.setChildrenSortDim(nextdim);
       rootNode.getChildren()[0] = leftChild;
       leftSide.remove(leftChild);
-      constructTree(leftChild, leftSide, (dim + 1) % this.numDims);
+      constructTree(leftChild, leftSide, nextdim);
     } else {
       //side is empty, child should be null
       rootNode.getChildren()[0] = null;
@@ -148,10 +149,10 @@ public class kdTree<T> implements kdInterface<T> {
     if (!rightSide.isEmpty()) {
       sortByDim(rightSide, dim);
       kdItem<T> rightChild = rightSide.get(rightSide.size() / 2);
-      rightChild.setChildrenSortDim(dim);
+      rightChild.setChildrenSortDim(nextdim);
       rootNode.getChildren()[1] = rightChild;
       rightSide.remove(rightChild);
-      constructTree(rightChild, rightSide, (dim + 1) % this.numDims);
+      constructTree(rightChild, rightSide, nextdim);
     } else {
       rootNode.getChildren()[1] = null;
     }
@@ -240,8 +241,8 @@ public class kdTree<T> implements kdInterface<T> {
       //Now calculate which of the branches we have to go down
       //Pushing the non-ideal child first is important, since the stack is FIFO
       //This means the ideal child will get checked first
-      double bestNonIdealDist = Math.abs(target.getDimension(currDim) - currItem.getDimension(currDim));
-      if (bestNonIdealDist < distanceThreshold || true) {
+      double bestNonIdealDist = Math.pow(target.getDimension(currDim) - currItem.getDimension(currDim), 2);
+      if (bestNonIdealDist < distanceThreshold) {
         //This means the other child could have a good value, we need to add it if it's there.
         if (currItem.getChildren()[nonIdealSide] != null) {
           toCheck.push(new Pair<>(currItem.getChildren()[nonIdealSide], distanceThreshold));

@@ -110,6 +110,7 @@ public class kdTreeTest {
         //loading tenStarList and starGetters to our global kdTree
         gkd.loadData(tenStarList, starGetters);
         //equal distance between >n stars
+        assertTrue(testListTie(gkd.nearestNeighbors(2, star4), List.of(star4, star3), List.of(star3, star8, star9)));
         assertEquals(Arrays.asList(star4, star3), gkd.nearestNeighbors(2, star4));
     }
 
