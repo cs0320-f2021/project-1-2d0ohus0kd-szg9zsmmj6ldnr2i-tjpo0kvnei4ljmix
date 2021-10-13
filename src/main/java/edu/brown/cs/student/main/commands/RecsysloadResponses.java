@@ -1,6 +1,7 @@
 package edu.brown.cs.student.main.commands;
 
 import edu.brown.cs.student.main.Command;
+import recommender.DummyStudentGetter;
 import recommender.Recommender;
 import recommender.RecommenderInterface;
 import recommender.Student;
@@ -41,7 +42,8 @@ public class RecsysloadResponses extends Command implements StudentGetter, Recom
 
     public Recommender studentsToRecommender() {
         Recommender studentsToRec = new Recommender();
-        studentsToRec.add(StudentGetter.getStudents());
+        DummyStudentGetter studentGetter = new DummyStudentGetter();
+        studentsToRec.add(studentGetter.getStudents());
         return studentsToRec;
     }
 }
