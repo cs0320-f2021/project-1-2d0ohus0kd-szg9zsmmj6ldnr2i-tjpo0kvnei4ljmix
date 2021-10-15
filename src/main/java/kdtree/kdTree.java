@@ -11,17 +11,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-//Simple dumb immutable pair class
-class Pair<A, B> {
-  public final A first;
-  public final B second;
-
-  public Pair(A a, B b) {
-    this.first = a;
-    this.second = b;
-  }
-}
-
 public class kdTree<T> implements kdInterface<T> {
   private int size = 0;
   private ArrayList<kdItem<T>> listData;
@@ -214,12 +203,18 @@ public class kdTree<T> implements kdInterface<T> {
     double distanceThreshold = Double.MAX_VALUE;
     Stack<Pair<kdItem<T>, Double>> toCheck = new Stack<>();
     assert (this.root != null);
-    toCheck.push(new Pair<>(this.root, distanceThreshold));
+    toCheck.push(new Pair<>(this.root, Double.MAX_VALUE));
 
     //Start searching
     while (!(toCheck.empty())) {
       Pair<kdItem<T>, Double> currPair = toCheck.pop();
       kdItem<T> currItem = currPair.first;
+      double bestPossibleDistCurrItem = currPair.second;
+      if (bestPossibleDistCurrItem > distanceThreshold) {
+        //This may have been a worthy branch of the tree to check out when it was originally pushed into the stack,
+        //Now, it's no longer viable because the best it can get is higher than our threshold
+        continue;
+      }
       int currDim = currItem.getChildrenSortDim();
       int idealSide;
       if (target.getDimension(currDim) < currItem.getDimension(currDim)) {
@@ -245,7 +240,7 @@ public class kdTree<T> implements kdInterface<T> {
       if (bestNonIdealDist < distanceThreshold) {
         //This means the other child could have a good value, we need to add it if it's there.
         if (currItem.getChildren()[nonIdealSide] != null) {
-          toCheck.push(new Pair<>(currItem.getChildren()[nonIdealSide], distanceThreshold));
+          toCheck.push(new Pair<>(currItem.getChildren()[nonIdealSide], bestNonIdealDist));
         }
       }
 
