@@ -1,5 +1,7 @@
 package edu.brown.cs.student.main;
 
+import java.util.Objects;
+
 public class Star {
 
   private final int id;
@@ -8,6 +10,25 @@ public class Star {
   private final double y;
   private final double z;
   private double dist = -1;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Star star = (Star) o;
+    return id == star.id && Double.compare(star.x, x) == 0 &&
+        Double.compare(star.y, y) == 0 && Double.compare(star.z, z) == 0 &&
+        name.equals(star.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, x, y, z);
+  }
 
   /**
    * Constructor for the Star class, which simply holds all info about a star.

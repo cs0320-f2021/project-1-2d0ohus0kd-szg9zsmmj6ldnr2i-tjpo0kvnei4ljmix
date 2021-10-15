@@ -1,6 +1,7 @@
 package kdtree;
 
 import com.google.common.math.DoubleMath;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,17 +10,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
-
-//Simple dumb immutable pair class
-class Pair<A, B> {
-  public final A first;
-  public final B second;
-
-  public Pair(A a, B b) {
-    this.first = a;
-    this.second = b;
-  }
-}
 
 public class kdTree<T> implements kdInterface<T> {
   private int size = 0;
@@ -95,8 +85,6 @@ public class kdTree<T> implements kdInterface<T> {
           assert dims[dim] <= 1;
         }
       }
-      //Make a new kdItem and replace the old one
-      normalizedData.set(i, new kdItem<>(normalizedData.get(i).getOriginalItem(), dims));
     }
 
     return normalizedData;
@@ -117,27 +105,68 @@ public class kdTree<T> implements kdInterface<T> {
 
   @Override
   public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters) {
-    this.kdGetters = new ArrayList<>(getters);
-    this.listData = normalizeData(dataToLoad, getters);
-    //listData is an ArrayList of kdItem objects, which all contain normalized fields
+    this.loadData(dataToLoad, getters, true);
+  }
 
-    //This is a bad implementation of inserting, we walk the tree each time we insert an element
-    //Plus, the tree doesn't even end up being balanced
+  private void constructTree(kdItem<T> rootNode, List<kdItem<T>> remainingItems, int dim) {
+    assert (rootNode.getChildrenSortDim() == dim);
+    double rootVal = rootNode.getDimension(dim);
+    //Partition the space into left and right sides with the rootVal being the separator
+    List<kdItem<T>> leftSide = new ArrayList<>();
+    List<kdItem<T>> rightSide = new ArrayList<>();
+    for (kdItem<T> currItem : remainingItems) {
+      if (rootVal > currItem.getDimension(dim)) {
+        leftSide.add(currItem);
+      } else {
+        rightSide.add(currItem);
+      }
+    }
 
-    //Make sure the root is at least somewhere near the center
-    ArrayList<kdItem<T>> dataCopy = new ArrayList<>(this.listData); //for mutability
-    sortByDim(dataCopy, 0);
-    for (kdItem<T> elm : dataCopy) {
-      this.insertItem(elm);
+    int nextdim = (dim + 1) % this.numDims;
+    if (!leftSide.isEmpty()){
+      sortByDim(leftSide, dim);
+      kdItem<T> leftChild = leftSide.get(leftSide.size() / 2);
+      leftChild.setChildrenSortDim(nextdim);
+      rootNode.getChildren()[0] = leftChild;
+      leftSide.remove(leftChild);
+      constructTree(leftChild, leftSide, nextdim);
+    } else {
+      //side is empty, child should be null
+      rootNode.getChildren()[0] = null;
+    }
+
+    if (!rightSide.isEmpty()) {
+      sortByDim(rightSide, dim);
+      kdItem<T> rightChild = rightSide.get(rightSide.size() / 2);
+      rightChild.setChildrenSortDim(nextdim);
+      rootNode.getChildren()[1] = rightChild;
+      rightSide.remove(rightChild);
+      constructTree(rightChild, rightSide, nextdim);
+    } else {
+      rootNode.getChildren()[1] = null;
     }
   }
 
   public void loadData(Collection<T> dataToLoad, List<kdGetter<T>> getters, boolean normalize) {
+    this.size = dataToLoad.size();
     this.normalize = normalize;
-    this.loadData(dataToLoad, getters);
+    this.kdGetters = new ArrayList<>(getters);
+    this.listData = normalizeData(dataToLoad, getters);
+    //listData is an ArrayList of kdItem objects, which all contain normalized fields
+
+    //Set up the root, then call constructTree recursively.
+    //dimension 0, first layer.
+    ArrayList<kdItem<T>> items = new ArrayList<>(this.listData); //make copy, list will be mutated.
+    sortByDim(items, 0);
+    this.root = items.get(items.size() / 2);
+    this.root.setChildrenSortDim(0);
+    items.remove(this.root);
+    constructTree(this.root, items, 0);
   }
 
-  private void sortByDim(ArrayList<kdItem<T>> data, int dim) {
+  /** Basically a wrapper for list.sort with a dimension comparator
+   */
+  private void sortByDim(List<kdItem<T>> data, int dim) {
     data.sort(new Comparator<kdItem<T>>() {
       @Override
       public int compare(kdItem<T> o1, kdItem<T> o2) {
@@ -152,33 +181,11 @@ public class kdTree<T> implements kdInterface<T> {
     });
   }
 
-
-  private void insertItem(kdItem<T> toInsert) {
-    kdTree<T>.kdItem<T> prevNode = null;
-    kdTree<T>.kdItem<T> currNode = this.root;
-    int currDim = 0;
-    int side = -1;
-    while (currNode != null) {
-      side = (toInsert.getDimension(currDim) < currNode.getDimension(currDim)) ? 0 : 1;
-      //if true, side is 0 (left). if false, side is 1. (right)
-      prevNode = currNode;
-      currNode = currNode.getChildren()[side];
-      //increment dim so that next time we loop, we're checking the next dimension
-      currDim = (currDim + 1) % this.numDims;
-    }
-    //Past the while loop, this means that currNode is null.
-    toInsert.setChildrenSortDim(currDim);
-    if (prevNode == null) {
-      //Empty tree -- insert node as the root
-      this.root = toInsert;
-    } else {
-      prevNode.getChildren()[side] = toInsert;
-    }
-    this.size++;
-  }
-
   @Override
   public List<T> nearestNeighbors(int n, T targetRaw) {
+    if (n > this.size) {
+      n = this.size;
+    }
     if (n == 0) {
       return new ArrayList<T>(); //return empty list if asking for 0 neighbors
     }
@@ -191,19 +198,37 @@ public class kdTree<T> implements kdInterface<T> {
     }
     kdItem<T> target = new kdItem<>(targetRaw, dims);
     kdItem<T>[] best = new kdItem[n];
+
+    //Setup stack and related variables
+    double distanceThreshold = Double.MAX_VALUE;
     Stack<Pair<kdItem<T>, Double>> toCheck = new Stack<>();
     assert (this.root != null);
-    double distanceThreshold = Double.MAX_VALUE;
-    toCheck.push(new Pair<>(this.root, distanceThreshold));
+    toCheck.push(new Pair<>(this.root, Double.MAX_VALUE));
+
+    //Start searching
     while (!(toCheck.empty())) {
-      kdItem<T> currItem = toCheck.pop().first;
+      Pair<kdItem<T>, Double> currPair = toCheck.pop();
+      kdItem<T> currItem = currPair.first;
+      double bestPossibleDistCurrItem = currPair.second;
+      if (bestPossibleDistCurrItem > distanceThreshold) {
+        //This may have been a worthy branch of the tree to check out when it was originally pushed into the stack,
+        //Now, it's no longer viable because the best it can get is higher than our threshold
+        continue;
+      }
       int currDim = currItem.getChildrenSortDim();
-      int idealSide = target.getDimension(currDim) < currItem.getDimension(currDim) ? 0 : 1;
-      // If the target's value is less than current, go left (0), otherwise right (1)
+      int idealSide;
+      if (target.getDimension(currDim) < currItem.getDimension(currDim)) {
+        //Go left if the target is less than current item
+        idealSide = 0;
+      } else {
+        //Go right
+        idealSide = 1;
+      }
+
       int nonIdealSide = (idealSide == 0) ? 1 : 0; //opposite of the ideal side
       currItem.calcDistance(target.getDimensionArray());
       double currItemDist = currItem.getDistance();
-      if (distanceThreshold > currItemDist) {
+      if (currItemDist < distanceThreshold) {
         distanceThreshold = bubbleIntoArray(best, currItem); //Insert into array of best values
         //bubbleIntoArray returns the new distanceThreshold
       }
@@ -211,11 +236,11 @@ public class kdTree<T> implements kdInterface<T> {
       //Now calculate which of the branches we have to go down
       //Pushing the non-ideal child first is important, since the stack is FIFO
       //This means the ideal child will get checked first
-      double bestNonIdealDist = Math.abs(target.getDimension(currDim) - currItem.getDimension(currDim));
+      double bestNonIdealDist = Math.pow(target.getDimension(currDim) - currItem.getDimension(currDim), 2);
       if (bestNonIdealDist < distanceThreshold) {
         //This means the other child could have a good value, we need to add it if it's there.
         if (currItem.getChildren()[nonIdealSide] != null) {
-          toCheck.push(new Pair<>(currItem.getChildren()[nonIdealSide], distanceThreshold));
+          toCheck.push(new Pair<>(currItem.getChildren()[nonIdealSide], bestNonIdealDist));
         }
       }
 
@@ -256,11 +281,6 @@ public class kdTree<T> implements kdInterface<T> {
     }
     //Getting here means array is fully filled
     return best[best.length - 1].getDistance();
-  }
-
-  @Override
-  public List<T> nearestNeighborsExcludingCenter(int n, T center) {
-    return this.nearestNeighbors(n + 1, center).subList(1, n + 1); // just take out first result
   }
 
   @Override
