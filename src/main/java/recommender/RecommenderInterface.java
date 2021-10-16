@@ -17,4 +17,10 @@ public interface RecommenderInterface {
    * @return List of the best pairings for the given student (sorted from best to worst)
    */
   public List<Student> bestStudents(int studentID, int k);
+
+  /**
+   *
+   * @return list of all students in no particular order
+   */
+  public List<Student> getAllStudents();
 }

@@ -2,6 +2,7 @@ package recommender;
 
 import bloomfilter.BloomFilter;
 import bloomfilter.BloomFilterRecommender;
+import edu.brown.cs.student.main.StarFinderNaive;
 import kdtree.kdGetter;
 import kdtree.kdTree;
 
@@ -11,6 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 public class Recommender implements RecommenderInterface{
+  private List<Student> allStudents;
+  private static Recommender instance = null;
+
+  public static Recommender getInstance() {
+    if (instance == null) {
+      instance = new Recommender();
+    }
+    return instance;
+  }
+
   private final List<kdGetter<Student>> studentGetters = List.of(
       new kdGetter<Student>() {
         @Override
@@ -35,6 +46,7 @@ public class Recommender implements RecommenderInterface{
   public void add(Collection<Student> studentsToAdd) {
     //Convert to map:
     for (Student s : studentsToAdd) {
+      this.allStudents.add(s);
       studentMap.put(String.valueOf(s.id), s); //Putting string because of Bloom Filter requirement
     }
     //Load into kdTree
@@ -50,5 +62,10 @@ public class Recommender implements RecommenderInterface{
       k = this.numStudents;
     }
     return kdt.nearestNeighbors(k, studentMap.get(String.valueOf(studentID)));
+  }
+
+  @Override
+  public List<Student> getAllStudents() {
+    return allStudents;
   }
 }

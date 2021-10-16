@@ -59,7 +59,9 @@ public class Student implements Item {
         '}';
   }
 
-
+  public String essentialInfoPrint() {
+    return "Student Name: " + this.name + ", ID: " + this.id;
+  }
 
   public String getName() {
     return name;

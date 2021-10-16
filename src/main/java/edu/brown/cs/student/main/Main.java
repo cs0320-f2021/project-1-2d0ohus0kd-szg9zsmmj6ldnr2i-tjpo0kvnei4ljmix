@@ -65,7 +65,7 @@ public final class Main {
     }
 
     //Setup commands
-    HashMap<String, Command> commands = CommandHandler.getCommands();
+    Map<String, Command> commands = CommandHandler.getCommands();
     Command previousCommand = null;
     boolean help = false;
 
