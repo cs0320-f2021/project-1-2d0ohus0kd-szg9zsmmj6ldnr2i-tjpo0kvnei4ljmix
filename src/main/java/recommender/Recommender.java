@@ -18,6 +18,16 @@ import java.util.Map;
 import java.util.Set;
 
 public class Recommender implements RecommenderInterface{
+  private List<Student> allStudents = new ArrayList<>();
+  private static Recommender instance = null;
+
+  public static Recommender getInstance() {
+    if (instance == null) {
+      instance = new Recommender();
+    }
+    return instance;
+  }
+
   private final List<kdGetter<Student>> studentGetters = List.of(
       new kdGetter<Student>() {
         @Override
@@ -43,12 +53,14 @@ public class Recommender implements RecommenderInterface{
     this.numStudents = studentsToAdd.size();
     //Convert to map:
     for (Student s : studentsToAdd) {
+      this.allStudents.add(s);
       studentMap.put(String.valueOf(s.id), s); //Putting string because of Bloom Filter requirement
     }
     //Load into kdTree
     kdt.loadData(studentsToAdd, studentGetters, true);
     //Load into Bloom Filter
     bloomfilterrec = new BloomFilterRecommender<Student>(studentMap, 0.01);
+
   }
 
   /**
@@ -117,5 +129,10 @@ public class Recommender implements RecommenderInterface{
     });
     //Need to take sublist again because bloom and kd will not return same subset of students
     return finalRecommendation.subList(0,k);
+  }
+
+  @Override
+  public List<Student> getAllStudents() {
+    return allStudents;
   }
 }
