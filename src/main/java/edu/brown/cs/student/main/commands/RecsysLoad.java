@@ -10,6 +10,7 @@ import java.util.Collection;
 public class RecsysLoad extends Command {
 
   public String run(String args) {
+    //Currently, loads students regardless of args
     Recommender studentsToRec = Recommender.getInstance();
     DummyStudentGetter studentGetter = new DummyStudentGetter();
     Collection<Student> students = studentGetter.getStudents();

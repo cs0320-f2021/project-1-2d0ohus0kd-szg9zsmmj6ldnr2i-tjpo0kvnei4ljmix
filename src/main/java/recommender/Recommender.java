@@ -6,13 +6,14 @@ import edu.brown.cs.student.main.StarFinderNaive;
 import kdtree.kdGetter;
 import kdtree.kdTree;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Recommender implements RecommenderInterface{
-  private List<Student> allStudents;
+  private List<Student> allStudents = new ArrayList<>();
   private static Recommender instance = null;
 
   public static Recommender getInstance() {
