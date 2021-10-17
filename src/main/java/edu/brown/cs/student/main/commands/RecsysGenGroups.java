@@ -5,10 +5,7 @@ import edu.brown.cs.student.main.Command;
 import recommender.Recommender;
 import recommender.Student;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class RecsysGenGroups extends Command {
 
@@ -63,14 +60,21 @@ public class RecsysGenGroups extends Command {
         for (Student s : proposingStudents) {
             //each student should propose to groupSize - 1 students from their bestStudents list
             //tap into bestStudentMap - each student should propose to each Student within the ranked list
-            bestStudentMap.get(String.valueOf(s));
-            //above, I've accessed the list of ranked students in proposingStudents. Now, how do I facilitate proposal?
 
 
+            //keep track of people who "may" end up together
+            ArrayList<Student> tentativeMatches;
+            tentativeMatches = new ArrayList<Student>();
 
+            //students who haven't "proposed" yet (still need to propose)
+            ArrayList<Student> freeStudents;
 
+            //access the list of ranked students in proposingStudents. Add each student's bestStudents to freeStudents
+            //this list deems whether or not our algorithm will get terminated
+            freeStudents = new ArrayList<Student>(bestStudentMap.get(String.valueOf(s)));
 
-            }
+            //stable matching code:
+            
 
 
     }
