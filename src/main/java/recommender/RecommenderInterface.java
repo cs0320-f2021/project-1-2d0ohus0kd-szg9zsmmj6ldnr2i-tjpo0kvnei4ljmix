@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface RecommenderInterface {
-  /** NOTE: This will REPLACE existing students
+  /**
    *
    * @param studentsToAdd students to add to the recommender
    */
