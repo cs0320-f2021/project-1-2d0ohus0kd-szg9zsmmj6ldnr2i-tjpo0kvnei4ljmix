@@ -47,8 +47,22 @@ public class RecsysGenGroups extends Command {
         //randomly shuffle all students
         Collections.shuffle(allStudents);
         //divide shuffled students into groupSize number of groups. return a list of sublists.
-        for (List group : Lists.partition(allStudents, allStudents.size()/groupSize)) {
+
+        //partition allStudents into sublists
+        List<List<Student>> partitionedList = Lists.partition(allStudents, allStudents.size() / groupSize);
+
+        //define the first sublist as the proposing sublist
+        List<Student> proposingStudents = partitionedList.get(0);
+
+
+        //iterate over proposingStudents, facilitating the proposal to each student's bestStudents.
+        for (Student s : proposingStudents) {
             
+
+
+
+            }
+
 
     }
 
