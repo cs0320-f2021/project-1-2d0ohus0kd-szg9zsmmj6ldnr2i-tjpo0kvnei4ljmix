@@ -1,10 +1,12 @@
 package edu.brown.cs.student.main.commands;
 
+import com.google.common.collect.Lists;
 import edu.brown.cs.student.main.Command;
 import recommender.Recommender;
 import recommender.Student;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,6 +39,17 @@ public class RecsysGenGroups extends Command {
          bestStudentMap.put(String.valueOf(s.id), recommender.bestStudents(s.id, numPerStudent));
       }
        return bestStudentMap;
+    }
+
+    //bestStudentMap maps a list<Student> of bestStudents as values for each studentId.
+
+    public String groupGenerator(int groupSize) {
+        //randomly shuffle all students
+        Collections.shuffle(allStudents);
+        //divide shuffled students into groupSize number of groups. return a list of sublists.
+        for (List group : Lists.partition(allStudents, allStudents.size()/groupSize)) {
+            
+
     }
 
     @Override
