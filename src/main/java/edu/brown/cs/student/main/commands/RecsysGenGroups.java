@@ -4,13 +4,12 @@ import edu.brown.cs.student.main.Command;
 import recommender.Recommender;
 import recommender.Student;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RecsysGenGroups extends Command {
-  @Override
-  public String run(String argString) {
+
     Recommender recommender = Recommender.getInstance();
     List<Student> allStudents = recommender.getAllStudents();
 
@@ -31,19 +30,18 @@ public class RecsysGenGroups extends Command {
      */
 
 
-    
-
-
-
-
-
-
-    public HashMap<String, List<String>> studentMapBuilder(List<Student> students, int numPerStudent) {
-       HashMap<String, List<String>> bestStudentMap;
+    public HashMap<String, List<Student>> studentMapBuilder(int numPerStudent) {
+       HashMap<String, List<Student>> bestStudentMap;
        bestStudentMap = new HashMap<>();
        for (Student s : allStudents) {
-         bestStudentMap = bestStudentMap.put(s.id, recommender.bestStudents(s.id, numPerStudent);
+         bestStudentMap = bestStudentMap.put(String.valueOf(s.id), recommender.bestStudents(s.id, numPerStudent)))
       }
+       return bestStudentMap;
+    }
+
+    @Override
+    public String run(String argString) {
+        return null;
     }
 
 
@@ -78,6 +76,8 @@ public class RecsysGenGroups extends Command {
      */
 
 
-    return null;
+
   }
+
+
 }
