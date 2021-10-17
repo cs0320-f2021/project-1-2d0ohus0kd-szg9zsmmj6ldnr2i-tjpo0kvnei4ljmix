@@ -44,6 +44,10 @@ public class RecsysGenGroups extends Command {
     //bestStudentMap maps a list<Student> of bestStudents as values for each studentId.
 
     public String groupGenerator(int groupSize) {
+        //using studentMapBuilder, generate a hashmap for allStudents, w/ groupSize - 1 ranked students per student.
+        HashMap<String, List<Student>> bestStudentMap;
+        bestStudentMap = studentMapBuilder(groupSize - 1);
+
         //randomly shuffle all students
         Collections.shuffle(allStudents);
         //divide shuffled students into groupSize number of groups. return a list of sublists.
@@ -57,7 +61,12 @@ public class RecsysGenGroups extends Command {
 
         //iterate over proposingStudents, facilitating the proposal to each student's bestStudents.
         for (Student s : proposingStudents) {
-            
+            //each student should propose to groupSize - 1 students from their bestStudents list
+            //tap into bestStudentMap - each student should propose to each Student within the ranked list
+            bestStudentMap.get(String.valueOf(s));
+            //above, I've accessed the list of ranked students in proposingStudents. Now, how do I facilitate proposal?
+
+
 
 
 
