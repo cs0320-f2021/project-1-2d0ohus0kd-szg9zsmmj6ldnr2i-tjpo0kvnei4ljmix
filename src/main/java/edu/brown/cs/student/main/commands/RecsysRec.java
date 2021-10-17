@@ -32,11 +32,11 @@ public class RecsysRec extends Command {
     Recommender recommender = Recommender.getInstance();
     List<Student> recommendations = recommender.bestStudents(studentID, k);
 
-    String output = "Best Students for ID " + studentID;
+    String output = "Best Students for ID " + studentID + "\n";
     for (Student s : recommendations) {
       output = output + s.essentialInfoPrint() + "\n";
     }
-    return output;
+    return output.substring(0,output.length() - 1); //remove last newline
   }
 
 }
