@@ -35,12 +35,14 @@ public class RecsysGenGroups extends Command {
 
 
 
-    HashMap<String, List<String>> bestStudentMap;
-    bestStudentMap = new HashMap<>();
 
-    public HashMap<String, List<String>> run(int numGroups, int numStudents) {
-      for (Student s : allStudents) {
-        bestStudentMap = bestStudentMap.put(s.id, recommender.bestStudents(s.id, numStudents);
+
+
+    public HashMap<String, List<String>> studentMapBuilder(List<Student> students, int numPerStudent) {
+       HashMap<String, List<String>> bestStudentMap;
+       bestStudentMap = new HashMap<>();
+       for (Student s : allStudents) {
+         bestStudentMap = bestStudentMap.put(s.id, recommender.bestStudents(s.id, numPerStudent);
       }
     }
 
