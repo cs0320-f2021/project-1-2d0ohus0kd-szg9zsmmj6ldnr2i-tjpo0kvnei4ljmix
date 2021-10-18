@@ -65,6 +65,12 @@ public class RecsysGenGroups extends Command {
 
     @Override
     public String run(String argString) {
-        return null;
+      int groupsize;
+      try{
+        groupsize = Integer.parseInt(argString);
+      } catch (NumberFormatException e) {
+        return "Could not convert: " + argString + " to a number";
+      }
+        return groupGenerator(groupsize);
     }
 }
