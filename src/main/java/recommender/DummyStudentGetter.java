@@ -24,6 +24,14 @@ public class DummyStudentGetter implements StudentGetter{
     for (int i = 0; i < NUM_STUDENTS; i++) {
       studentList.add(randomStudent());
     }
+
+    studentList.add(new Student(1001, "Nim Telson", true, Grade.SECONDYEAR, 6,
+          Horoscope.PISCES, List.of(MeetingTime.LATE_AFTERNOON, MeetingTime.EVENING),
+          "Python", "", false, 1, 2,
+          3, 4, 5, 6,
+          List.of("Positive stuff"), List.of("Negative stuff"), List.of("Interests"))
+    );
+
     return studentList;
   }
 }
