@@ -19,9 +19,9 @@ public class RecsysLoad extends Command {
     if (students == null) {
       return "ERROR: Students list was null";
     }
-    for (Student s : students) {
+    /*for (Student s : students) {
       System.out.print(s);
-    }
+    }*/
     studentsToRec.add(students);
     int numStudents = students.size();
     return "Loaded " + numStudents + " Students";
