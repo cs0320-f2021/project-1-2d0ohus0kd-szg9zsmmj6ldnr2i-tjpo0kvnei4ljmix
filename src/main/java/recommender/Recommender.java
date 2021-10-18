@@ -10,13 +10,18 @@ import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Recommender implements RecommenderInterface{
   private List<Student> allStudents = new ArrayList<>();
   private static Recommender instance = null;
+
+  private static final int MAX_INVERT_VAL = 10;//Highest the inverted values can go
+  // (fields like YearsExperience that can go higher will just be set to 0)
 
   public static Recommender getInstance() {
     if (instance == null) {
@@ -25,20 +30,69 @@ public class Recommender implements RecommenderInterface{
     return instance;
   }
 
-  private final List<kdGetter<Student>> studentGetters = List.of(
-      new kdGetter<Student>() {
-        @Override
-        public double getValue(Student elm) {
-          return elm.yearsExperience;
+  public static List<kdGetter<Student>> getStudentGetters() {
+    return List.of(
+        new kdGetter<Student>() {
+          @Override
+          public double getValue(Student elm) {
+            return elm.yearsExperience;
+          }
+        },
+        new kdGetter<Student>() {
+          @Override
+          public double getValue(Student elm) {
+            return elm.frontendScore;
+          }
+        },
+        new kdGetter<Student>() {
+          @Override
+          public double getValue(Student elm) {
+            return elm.teamworkScore;
+          }
+        },
+        new kdGetter<Student>() {
+          @Override
+          public double getValue(Student elm) {
+            return elm.testingScore;
+          }
+        },
+        new kdGetter<Student>() {
+          @Override
+          public double getValue(Student elm) {
+            return elm.oopScore;
+          }
+        },
+        new kdGetter<Student>() {
+          @Override
+          public double getValue(Student elm) {
+            return elm.algorithmsScore;
+          }
+        },
+        new kdGetter<Student>() {
+          @Override
+          public double getValue(Student elm) {
+            return elm.commentingScore;
+          }
         }
-      },
-      new kdGetter<Student>() {
-        @Override
-        public double getValue(Student elm) {
-          return elm.grade.getValue();
-        }
-      }
-  );
+    );
+  }
+
+  public static Student invertStudent(Student s){
+    return new Student(s.id, s.getName(), s.meetsInPerson, s.grade,
+        Math.abs(MAX_INVERT_VAL - Math.min(MAX_INVERT_VAL, s.yearsExperience)),
+        s.horoscope, s.getMeetingTimeList(), s.getPreferredLanguage(),
+        s.getMarginalizedGroup(), s.preferGroup,
+        Math.abs(MAX_INVERT_VAL - s.commentingScore),
+        Math.abs(MAX_INVERT_VAL - s.testingScore),
+        Math.abs(MAX_INVERT_VAL - s.oopScore),
+        Math.abs(MAX_INVERT_VAL - s.algorithmsScore),
+        Math.abs(MAX_INVERT_VAL - s.teamworkScore),
+        Math.abs(MAX_INVERT_VAL - s.frontendScore),
+        s.getPositiveTraits(), s.getNegativeTraits(), s.getInterests());
+  }
+
+
+  private final List<kdGetter<Student>> studentGetters = getStudentGetters();
   private BloomFilterRecommender<Student> bloomfilterrec;
   private kdTree<Student> kdt = new kdTree<>();
   private HashMap<String, Student> studentMap = new HashMap<>();
@@ -47,6 +101,7 @@ public class Recommender implements RecommenderInterface{
 
   @Override
   public void add(Collection<Student> studentsToAdd) {
+    this.numStudents = studentsToAdd.size();
     //Convert to map:
     for (Student s : studentsToAdd) {
       this.allStudents.add(s);
@@ -71,13 +126,16 @@ public class Recommender implements RecommenderInterface{
     combine the scores from all three sources to get a final recommendation
      */
 
-    Student target = studentMap.get(String.valueOf(studentID));
+    Student targetraw = studentMap.get(String.valueOf(studentID));
+    Student target = invertStudent(targetraw);
+    //Invert fields from target that we want to search for complements of
+
+
     //Get recommendations from kdTree
     List<Student> kdRecommendations = this.kdt.nearestNeighbors(k + 1, target);
     kdRecommendations.remove(target);
     //Get recommendations from Bloom Filter
-    List<Student> bloomRecommendations = kdRecommendations; //TODO remove this
-
+    List<Student> bloomRecommendations = kdRecommendations; //TODO remove this once I understand the function of bloomRecommendations
     // TODO Uncomment: List<Student> bloomRecommendations = this.bloomfilterrec.getTopKRecommendations(target, k);
 
     assert(kdRecommendations.size() == bloomRecommendations.size());
@@ -96,8 +154,8 @@ public class Recommender implements RecommenderInterface{
     }
 
     //If the target student wants to be matched with a similar marginalized group, factor in string similarity
-    JaroWinklerSimilarity jwSimilarity = new JaroWinklerSimilarity();
     if (target.preferGroup) {
+      JaroWinklerSimilarity jwSimilarity = new JaroWinklerSimilarity();
       Set<Student> studentKeys = studentRankings.keySet();
       for (Student s : studentKeys) {
         Double groupSimilarity = jwSimilarity.apply(target.getMarginalizedGroup(), s.getMarginalizedGroup());
@@ -116,11 +174,12 @@ public class Recommender implements RecommenderInterface{
       public int compare(Student o1, Student o2) {
         int o1Rank = studentRankings.get(o1);
         int o2Rank = studentRankings.get(o2);
-        if (o1Rank < o2Rank) return -1;
-        if (o1Rank > o2Rank) return 1;
+        if (o1Rank < o2Rank) return 1;
+        if (o1Rank > o2Rank) return -1;
         return 0; //They're equal
       }
     });
+    finalRecommendation.remove(targetraw); //can't have the original student showing up in results
     //Need to take sublist again because bloom and kd will not return same subset of students
     return finalRecommendation.subList(0,k);
   }

@@ -6,14 +6,14 @@ import java.util.List;
 
 public class Student implements Item {
   public final int id;
-  private String name;
+  private final String name;
   public final boolean meetsInPerson;
   public final Grade grade; //can ONLY be one of the grade options
   public final int yearsExperience;
   public final Horoscope horoscope;
-  private List<MeetingTime> meetingTimeList;
-  private String preferredLanguage;
-  private String marginalizedGroup; //Maybe pair people by string similarity?
+  private final List<MeetingTime> meetingTimeList;
+  private final String preferredLanguage;
+  private final String marginalizedGroup; //Maybe pair people by string similarity?
   public final boolean preferGroup;
   public final int commentingScore;
   public final int testingScore;
@@ -21,9 +21,9 @@ public class Student implements Item {
   public final int algorithmsScore;
   public final int teamworkScore;
   public final int frontendScore;
-  private List<String> positiveTraits;
-  private List<String> negativeTraits;
-  private List<String> interests;
+  private final List<String> positiveTraits;
+  private final List<String> negativeTraits;
+  private final List<String> interests;
 
 
   /*
@@ -42,22 +42,6 @@ public class Student implements Item {
   marginalizedGroup -> Bloom Filter
   ^ Find people who are similar if the student is perferGroup (otherwise ignore)
    */
-
-  @Override
-  public String toString() {
-    return "Student{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", meetsInPerson=" + meetsInPerson +
-        ", grade=" + grade +
-        ", yearsExperience=" + yearsExperience +
-        ", horoscope=" + horoscope +
-        ", meetingTimeList=" + meetingTimeList +
-        ", preferredLanguage='" + preferredLanguage + '\'' +
-        ", marginalizedGroup='" + marginalizedGroup + '\'' +
-        ", preferGroup=" + preferGroup +
-        '}';
-  }
 
   public String essentialInfoPrint() {
     return "Student Name: " + this.name + ", ID: " + this.id;
@@ -120,5 +104,42 @@ public class Student implements Item {
   @Override
   public String getId() {
     return String.valueOf(this.id);
+  }
+
+  public List<String> getPositiveTraits() {
+    return positiveTraits;
+  }
+
+  public List<String> getNegativeTraits() {
+    return negativeTraits;
+  }
+
+  public List<String> getInterests() {
+    return interests;
+  }
+
+  @Override
+  public String toString() {
+    return "Student{" +
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", meetsInPerson=" + meetsInPerson +
+        ", grade=" + grade +
+        ", yearsExperience=" + yearsExperience +
+        ", horoscope=" + horoscope +
+        ", meetingTimeList=" + meetingTimeList +
+        ", preferredLanguage='" + preferredLanguage + '\'' +
+        ", marginalizedGroup='" + marginalizedGroup + '\'' +
+        ", preferGroup=" + preferGroup +
+        ", commentingScore=" + commentingScore +
+        ", testingScore=" + testingScore +
+        ", oopScore=" + oopScore +
+        ", algorithmsScore=" + algorithmsScore +
+        ", teamworkScore=" + teamworkScore +
+        ", frontendScore=" + frontendScore +
+        ", positiveTraits=" + positiveTraits +
+        ", negativeTraits=" + negativeTraits +
+        ", interests=" + interests +
+        '}';
   }
 }
