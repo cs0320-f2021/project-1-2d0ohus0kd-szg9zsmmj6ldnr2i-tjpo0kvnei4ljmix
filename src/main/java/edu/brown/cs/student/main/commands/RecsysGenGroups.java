@@ -6,6 +6,8 @@ import recommender.Recommender;
 import recommender.Student;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RecsysGenGroups extends Command {
 
@@ -56,33 +58,56 @@ public class RecsysGenGroups extends Command {
         List<Student> proposingStudents = partitionedList.get(0);
 
 
-        //iterate over proposingStudents, facilitating the proposal to each student's bestStudents.
+        //iterate over proposingStudents, create groups comprising the proposing students and their bestStudents.
+        //return in String form.
+
+        String idealGroups = null;
         for (Student s : proposingStudents) {
+            //create a group with student s and their bestStudent list
+            ArrayList<Student> groupCreated;
+            groupCreated = new ArrayList<Student>();
+            groupCreated.add(s);
+            //create a list including each student and their respective bestStudents, iteratively.
+            idealGroups = Stream.of(groupCreated, bestStudentMap.get(s)).flatMap(x -> x.stream()).collect(Collectors.toList()).toString();
+        }
+
+        return idealGroups;
+    }
+
+
+
+
+
+
+
             //each student should propose to groupSize - 1 students from their bestStudents list
             //tap into bestStudentMap - each student should propose to each Student within the ranked list
 
 
-            //keep track of people who "may" end up together
-            ArrayList<Student> tentativeMatches;
-            tentativeMatches = new ArrayList<Student>();
-
-            //students who haven't "proposed" yet (still need to propose)
-            ArrayList<Student> freeStudents;
+//            //keep track of people who "may" end up together
+//            ArrayList<Student> tentativeMatches;
+//            tentativeMatches = new ArrayList<Student>();
+//
+//            //students who haven't "proposed" yet (still need to propose)
+//            ArrayList<Student> freeStudents;
 
             //access the list of ranked students in proposingStudents. Add each student's bestStudents to freeStudents
             //this list deems whether or not our algorithm will get terminated
-            freeStudents = new ArrayList<Student>(bestStudentMap.get(String.valueOf(s)));
-
-            //stable matching code:
-            
+//            freeStudents = new ArrayList<Student>(bestStudentMap.get(String.valueOf(s)));
 
 
-    }
+//            //stable matching code:
+//            while(freeStudents.size()>0) {
+//                for(Student stu : freeStudents) {
+//
+//                }
+//
+//            }
 
-    @Override
-    public String run(String argString) {
-        return null;
-    }
+
+
+
+
 
 
 
@@ -117,7 +142,10 @@ public class RecsysGenGroups extends Command {
 
 
 
-  }
 
 
+    @Override
+    public String run(String argString) {
+        return null;
+    }
 }
