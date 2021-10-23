@@ -38,6 +38,8 @@ interface kdInterface<ArbitraryType>{
    */
   public List<ArbitraryType> nearestNeighbors(int n, ArbitraryType center);
 
+  public List<ArbitraryType> nearestNeighborsExcludingCenter(int n, ArbitraryType center);
+
   /**
    *
    * @return A list of all the items in the KD-tree in no particular order

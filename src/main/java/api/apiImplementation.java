@@ -16,21 +16,12 @@ public class apiImplementation implements apiInterface {
 
     @Override
     public Collection getFromJson(APIenum field, String path) {
-        switch (field){
-            case RENT:
-                return this.jp.justrentListFromJson(path);
-            case USER:
-                return this.jp.justuserListFromJson(path);
-            case REVIEW:
-                return this.jp.justreviewListFromJson(path);
-            default:
-                throw new IllegalArgumentException("Not a valid field");
-        }
+        return jp.parserFromFile(path, field);
     }
 
     @Override
     public Collection getFromApi(APIenum field) {
-        switch (field){
+        switch (field) {
             case RENT:
                 return this.aggregator.justrentAggregator();
             case USER:

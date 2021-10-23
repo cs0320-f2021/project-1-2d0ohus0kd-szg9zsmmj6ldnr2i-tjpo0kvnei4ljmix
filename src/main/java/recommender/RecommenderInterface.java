@@ -3,12 +3,12 @@ package recommender;
 import java.util.Collection;
 import java.util.List;
 
-public interface RecommenderInterface {
+public interface RecommenderInterface<T extends Student> {
   /**
    *
    * @param studentsToAdd students to add to the recommender
    */
-  public void add(Collection<Student> studentsToAdd);
+  public void add(Collection<T> studentsToAdd);
 
   /**
    *
@@ -16,11 +16,5 @@ public interface RecommenderInterface {
    * @param k number of recommendations to provide
    * @return List of the best pairings for the given student (sorted from best to worst)
    */
-  public List<Student> bestStudents(int studentID, int k);
-
-  /**
-   *
-   * @return list of all students in no particular order
-   */
-  public List<Student> getAllStudents();
+  public List<T> bestStudents(int studentID, int k);
 }

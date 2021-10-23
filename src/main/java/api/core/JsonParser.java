@@ -1,10 +1,12 @@
 package api.core;
 
+import api.APIenum;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class JsonParser {
@@ -44,28 +46,23 @@ public class JsonParser {
         return gson.fromJson(s, type);
     }
 
-    public void parserFromFile(String path) {
+    public Collection parserFromFile(String path, APIenum field) {
         FileParser fileParser = new FileParser(path);
         String line = fileParser.readNewLine();
-        int count = 0;
+        String s = "";
         while (line != null) {
-            if (count == 0)
-                line = line.substring(1, line.length() - 1);
-            else
-                line = line.substring(0, line.length() - 1);
-            count++;
-            if (path.endsWith("justusersSMALL.json")) {
-                Justuser justuser = justuserFromJson(line);
-                System.out.println(justuser);
-            } else if (path.endsWith("justrentSMALL.json")) {
-                Justrent justrent = justrentFromJson(line);
-                System.out.println(justrent);
-            } else if (path.endsWith("justreviewsSMALL.json")) {
-                Justreview justreview = justreviewFromJson(line);
-                System.out.println(justreview);
-            } else
-                throw new IllegalArgumentException("error file");
+            s += line;
             line = fileParser.readNewLine();
+        }
+        switch (field) {
+            case RENT:
+                return justrentListFromJson(s);
+            case USER:
+                return justuserListFromJson(s);
+            case REVIEW:
+                return justreviewListFromJson(s);
+            default:
+                throw new IllegalArgumentException("Not a valid field");
         }
     }
 }

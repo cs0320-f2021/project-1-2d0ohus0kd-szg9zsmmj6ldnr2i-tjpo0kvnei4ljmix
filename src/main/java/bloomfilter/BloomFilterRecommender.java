@@ -7,7 +7,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
-public class BloomFilterRecommender<T extends Item> implements BloomRecommender<T> {
+public class BloomFilterRecommender<T extends Item> implements Recommender<T> {
   private HashMap<String, T> items;
   private HashMap<String, BloomFilter<String>> bloomFilters;
   private double desiredFalsePositiveRate;

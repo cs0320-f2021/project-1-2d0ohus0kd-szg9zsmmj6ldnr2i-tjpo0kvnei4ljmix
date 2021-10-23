@@ -28,15 +28,15 @@ public class UsersCommand extends Command {
       new kdGetter<Justuser>() {
         @Override
         public double getValue(Justuser elm) {
-          return Double.parseDouble(
-              elm.getWeight()); //when weight changes to int/double, remove the Double.parseDouble
+          String wight=elm.getWeight();
+          return Double.parseDouble(wight.substring(0,wight.length()-4)); // changes string to int/double
         }
       },
       new kdGetter<Justuser>() {
         @Override
         public double getValue(Justuser elm) {
-          return Double.parseDouble(
-              elm.getHeight()); //when height changes to int/double, remove the Double.parseDouble
+            String wight =elm.getHeight();
+            return Double.parseDouble(String.valueOf(wight.charAt(0)))*12+Double.parseDouble(String.valueOf(wight.charAt(3)));// changes string to int/double
         }
       },
       new kdGetter<Justuser>() {

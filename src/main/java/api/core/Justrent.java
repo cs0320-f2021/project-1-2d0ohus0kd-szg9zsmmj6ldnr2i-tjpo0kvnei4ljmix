@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Justrent {
     private String fit;
-    private String user_id;
+    private int user_id;
     private String item_id;
     private int rating;
     private String rented_for;
@@ -56,11 +56,11 @@ public class Justrent {
         this.fit = fit;
     }
 
-    public String getUser_id() {
+    public int getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(String user_id) {
+    public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
 

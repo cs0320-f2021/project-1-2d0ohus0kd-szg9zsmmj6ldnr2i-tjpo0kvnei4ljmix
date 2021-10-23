@@ -3,7 +3,7 @@ package api.core;
 import java.util.Objects;
 
 public class Justuser {
-    private String user_id;
+    private int user_id;
     private String weight;
     private String bust_size;
     private String height;
@@ -34,11 +34,11 @@ public class Justuser {
         }
         Justuser justuser = (Justuser) o;
         return age == justuser.age && Objects.equals(user_id, justuser.user_id) &&
-            Objects.equals(weight, justuser.weight) &&
-            Objects.equals(bust_size, justuser.bust_size) &&
-            Objects.equals(height, justuser.height) &&
-            Objects.equals(body_type, justuser.body_type) &&
-            Objects.equals(horoscope, justuser.horoscope);
+                Objects.equals(weight, justuser.weight) &&
+                Objects.equals(bust_size, justuser.bust_size) &&
+                Objects.equals(height, justuser.height) &&
+                Objects.equals(body_type, justuser.body_type) &&
+                Objects.equals(horoscope, justuser.horoscope);
     }
 
     @Override
@@ -46,11 +46,11 @@ public class Justuser {
         return Objects.hash(user_id, weight, bust_size, height, age, body_type, horoscope);
     }
 
-    public String getUser_id() {
+    public int getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(String user_id) {
+    public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
 
